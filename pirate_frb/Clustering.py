@@ -1,8 +1,8 @@
 """Associate duplicate PIRATE candidates into representative events.
 
-A dispersed pulse can be reported by several overlapping dedispersion trees.
-This module groups those candidate rows when their beam, primary-tree family,
-DM, and absolute low-frequency arrival coordinates are compatible.  It retains
+A dispersed pulse can leave several peaks in one tree or near the DM boundary
+between primary trees. This module groups those rows when their beam, DM, and
+absolute low-frequency arrival coordinates are compatible. It retains
 the original candidate table and a member-link table, while the compact event
 table takes its measured physical fields from one loudest representative.
 Candidate edge/quality flags are never combined: an event receives its
@@ -10,15 +10,16 @@ representative's flags and every member's own flags remain accessible through
 the candidate table.
 
 All candidate-sized columns remain on one CUDA device.  Independent
-``(beam_id, primary_tree_index)`` partitions are grouped by persistent CUDA
+``beam_id`` partitions are grouped by persistent CUDA
 blocks, so the representative loop and all candidate comparisons execute on
 the GPU.  Compact device-side sorting and remapping restore the exact global
 event order after the partitions finish.  Final event/member array transfer
 belongs to the catalog/output layer, not this module.
 
 The association rule is intentionally representative-seeded.  Every event is
-defined by candidates compatible with its loudest seed, with at most one
-candidate selected from each tree.  It is neither transitive connected-component
+defined by all unassigned candidates compatible with its loudest seed, including
+multiple members of one tree and members of different primary families.
+It is neither transitive connected-component
 clustering nor complete-link clustering: compatibility between nonrepresentative
 members is not evaluated and cannot grow an event beyond the seed's geometry.
 """
@@ -53,7 +54,6 @@ _CANONICAL_PREDICATE_DTYPES = (
 
 _CUDA_SOURCE_TEMPLATE = r"""
 // Header-free for NVRTC installations without host standard include paths.
-#define PIRATE_NO_WINNER 0xffffffffffffffffULL
 
 __device__ __forceinline__ unsigned long long pirate_globaltimer_ns()
 {
@@ -86,10 +86,7 @@ __device__ __forceinline__ int pirate_stop_requested(
 extern "C" __global__
 void group_representative_partitions(
         const long long *partition_offsets,
-        const long long *partition_tree_offsets,
         const long long *candidate_index,
-        const long long *candidate_tree_slot,
-        const int *tree,
         const PIRATE_DM_TYPE *dm,
         const PIRATE_TOA_TYPE *toa_sample_abs,
         const PIRATE_DM_STEP_TYPE *dm_step,
@@ -98,7 +95,6 @@ void group_representative_partitions(
         const double time_padding_bins,
         const double residual_slope_lo_samples_per_dm,
         const double residual_slope_hi_samples_per_dm,
-        const int use_shared_winners,
         const unsigned long long timeout_ns,
         const int timeout_checks_enabled,
         const long long test_timeout_after_work_tiles,
@@ -107,7 +103,6 @@ void group_representative_partitions(
         unsigned long long *completed_work_tiles,
         unsigned long long *completed_events,
         int *timeout_flag,
-        unsigned long long *global_winners,
         long long *provisional_event_by_position,
         long long *provisional_representative,
         int *provisional_member_count)
@@ -117,14 +112,6 @@ void group_representative_partitions(
     const int nthreads = (int)blockDim.x;
     const long long begin = partition_offsets[partition];
     const long long end = partition_offsets[partition + 1];
-    const long long tree_begin = partition_tree_offsets[partition];
-    const long long tree_end = partition_tree_offsets[partition + 1];
-    const long long tree_count = tree_end - tree_begin;
-
-    extern __shared__ unsigned long long shared_winners[];
-    unsigned long long *winners = use_shared_winners
-        ? shared_winners
-        : global_winners + tree_begin;
     __shared__ unsigned long long deadline_ns;
     __shared__ int stop_requested;
     __shared__ int committed_member_count;
@@ -168,33 +155,11 @@ void group_representative_partitions(
             continue;
         }
 
-        // Clear the compact per-tree winner workspace cooperatively.  Checking
-        // after each block-sized tile bounds cancellation latency even for an
-        // unusually large set of trees.
-        for (long long tree_tile = 0;
-             tree_tile < tree_count;
-             tree_tile += nthreads) {
-            const long long local_tree = tree_tile + tid;
-            if (local_tree < tree_count) {
-                winners[local_tree] = PIRATE_NO_WINNER;
-            }
-            __syncthreads();
-            if (tid == 0) {
-                stop_requested = pirate_stop_requested(
-                    deadline_ns, timeout_ns, timeout_checks_enabled,
-                    timeout_flag
-                );
-            }
-            __syncthreads();
-            if (stop_requested) {
-                break;
-            }
+        const long long provisional_slot = begin + (long long)local_event_id;
+        int thread_member_count = 0;
+        if (tid == 0) {
+            committed_member_count = 1;  // The representative itself.
         }
-        if (stop_requested) {
-            break;
-        }
-
-        const int representative_tree = tree[representative_position];
         const PIRATE_DM_TYPE representative_dm = dm[representative_position];
         const PIRATE_TOA_TYPE representative_toa =
             toa_sample_abs[representative_position];
@@ -203,16 +168,16 @@ void group_representative_partitions(
         const PIRATE_TIME_STEP_TYPE representative_time_step =
             time_step_samples[representative_position];
 
-        // Scan in fixed block-sized tiles.  Winners stay provisional until the
-        // entire representative event has been scanned, so timeout can discard
-        // the in-progress event without exposing a partial assignment.
+        // Stage every compatible row in fixed block-sized tiles. The slot's
+        // representative marker remains -1 until the complete scan commits.
+        // On cancellation, result remapping discards all rows pointing to this
+        // uncommitted slot without a rollback pass or exposing a partial group.
         for (long long tile_begin = representative_position + 1;
              tile_begin < end;
              tile_begin += nthreads) {
             const long long position = tile_begin + tid;
             if (position < end
-                    && provisional_event_by_position[position] < 0
-                    && tree[position] != representative_tree) {
+                    && provisional_event_by_position[position] < 0) {
                 // Preserve CuPy's operation-stage rounding for direct float32
                 // and mixed-precision GpuDecodedCandidates inputs.
                 const PIRATE_DM_TYPE delta_dm = (PIRATE_DM_TYPE)(
@@ -276,12 +241,8 @@ void group_representative_partitions(
                                 >= (PIRATE_TIME_COMPARE_TYPE)interval_lo
                             && (PIRATE_TIME_COMPARE_TYPE)delta_toa
                                 <= (PIRATE_TIME_COMPARE_TYPE)interval_hi) {
-                        const long long local_tree_slot =
-                            candidate_tree_slot[position] - tree_begin;
-                        atomicMin(
-                            &winners[local_tree_slot],
-                            (unsigned long long)position
-                        );
+                        provisional_event_by_position[position] = provisional_slot;
+                        ++thread_member_count;
                     }
                 }
             }
@@ -322,26 +283,16 @@ void group_representative_partitions(
             break;
         }
 
-        // Commit is intentionally indivisible with respect to cancellation.
-        // Once it starts, all winners and the seed are assigned before the
-        // representative marker publishes this event as valid.  The next
-        // deadline check may therefore overshoot by this one bounded pass.
-        const long long provisional_slot = begin + (long long)local_event_id;
+        // All membership writes have finished. Commit only a fixed-size block
+        // reduction and the seed, then publish the representative marker last.
+        // Cancellation cannot expose an incomplete group, even when it has
+        // arbitrarily many members from the same tree.
         if (tid == 0) {
             provisional_event_by_position[representative_position] =
                 provisional_slot;
-            committed_member_count = 1;
         }
-        __syncthreads();
-        for (long long local_tree = tid;
-             local_tree < tree_count;
-             local_tree += nthreads) {
-            const unsigned long long winner = winners[local_tree];
-            if (winner != PIRATE_NO_WINNER) {
-                provisional_event_by_position[(long long)winner] =
-                    provisional_slot;
-                atomicAdd(&committed_member_count, 1);
-            }
+        if (thread_member_count != 0) {
+            atomicAdd(&committed_member_count, thread_member_count);
         }
         __syncthreads();
         if (tid == 0) {
@@ -970,9 +921,9 @@ def compatible_with_representative(
             <= max(slope_lo*ΔDM, slope_hi*ΔDM) + P.
 
     Taking min/max is important for negative ΔDM, which reverses the edge order.
-    Candidates must also have the same beam and primary-tree family, and must
-    originate from different trees.  The latter enforces the event invariant of
-    at most one candidate per tree; same-tree peaks remain separate.
+    Candidates must have the same beam. Tree and primary-family labels are
+    provenance, not association vetoes: multiple peaks in one tree and peaks
+    across a primary DM boundary can join the same representative's event.
 
     Decoded width is intentionally not part of compatibility.  It is a measured
     winning-profile property that can vary across trees, while these tolerances
@@ -1000,13 +951,10 @@ def compatible_with_representative(
         candidates.time_step_samples[other],
         candidates.time_step_samples[rep],
     )
-    # Combine categorical provenance requirements with the two physical
-    # inequalities in one candidate-sized GPU mask.
+    # Combine beam isolation with the two physical inequalities. Native tree
+    # resolution sets the tolerances but tree identity cannot veto a match.
     return (
         (candidates.beam_id[other] == candidates.beam_id[rep])
-        & (candidates.primary_tree_index[other]
-           == candidates.primary_tree_index[rep])
-        & (candidates.tree[other] != candidates.tree[rep])
         & (cp.abs(ddm) <= dm_limit)
         & (dtoa >= cp.minimum(edge_lo, edge_hi) - padding)
         & (dtoa <= cp.maximum(edge_lo, edge_hi) + padding)
@@ -1110,15 +1058,11 @@ def _raw_grouping_kernel(
 
 @dataclass(frozen=True)
 class _PartitionLayout:
-    """GPU-only candidate and distinct-tree layout for one kernel launch."""
+    """GPU-only candidate ordering and beam partitions for one kernel launch."""
 
     candidate_order: Any
     partition_offsets: Any
-    partition_tree_offsets: Any
-    tree_slot_by_position: Any
     partition_count: int
-    distinct_partition_tree_count: int
-    maximum_trees_per_partition: int
 
 
 def _stable_sort_from_least_to_most(indices, keys):
@@ -1131,95 +1075,32 @@ def _stable_sort_from_least_to_most(indices, keys):
 
 
 def _partition_layout(candidates, order):
-    """Build exact beam/family partitions and compact partition/tree slots."""
+    """Partition by beam only, preserving global priority within each beam."""
 
     n = len(candidates)
     if not n:
-        empty = cp.empty(0, dtype=cp.int64)
         return _PartitionLayout(
-            candidate_order=empty,
+            candidate_order=cp.empty(0, dtype=cp.int64),
             partition_offsets=cp.zeros(1, dtype=cp.int64),
-            partition_tree_offsets=cp.zeros(1, dtype=cp.int64),
-            tree_slot_by_position=empty,
             partition_count=0,
-            distinct_partition_tree_count=0,
-            maximum_trees_per_partition=0,
         )
-
-    # Stable sorting starts from global representative priority, so rank inside
-    # every independent partition remains exact.
+    # Family remains a deterministic tie-breaker in global priority but must
+    # not partition candidates which can associate across a DM boundary.
     candidate_order = _stable_sort_from_least_to_most(
-        order,
-        (candidates.primary_tree_index, candidates.beam_id),
+        order, (candidates.beam_id,),
     )
     beam = candidates.beam_id[candidate_order]
-    family = candidates.primary_tree_index[candidate_order]
-    partition_boundary = cp.concatenate((
-        cp.ones(1, dtype=cp.bool_),
-        (beam[1:] != beam[:-1]) | (family[1:] != family[:-1]),
+    boundary = cp.concatenate((
+        cp.ones(1, dtype=cp.bool_), beam[1:] != beam[:-1],
     ))
-    partition_starts = cp.flatnonzero(partition_boundary).astype(
-        cp.int64, copy=False
-    )
-    partition_offsets = cp.concatenate((
-        partition_starts,
-        cp.asarray([n], dtype=cp.int64),
-    ))
-    partition_count = int(partition_starts.size)
-    partition_by_position = cp.cumsum(
-        partition_boundary, dtype=cp.int64
-    ) - 1
-    partition_by_candidate = cp.empty(n, dtype=cp.int64)
-    partition_by_candidate[candidate_order] = partition_by_position
-
-    # Assign one compact winner slot to each distinct (partition, tree) pair.
-    pair_order = _stable_sort_from_least_to_most(
-        cp.arange(n, dtype=cp.int64),
-        (candidates.tree, partition_by_candidate),
-    )
-    pair_partition = partition_by_candidate[pair_order]
-    pair_tree = candidates.tree[pair_order]
-    pair_boundary = cp.concatenate((
-        cp.ones(1, dtype=cp.bool_),
-        (pair_partition[1:] != pair_partition[:-1])
-        | (pair_tree[1:] != pair_tree[:-1]),
-    ))
-    tree_slot_by_candidate = cp.empty(n, dtype=cp.int64)
-    tree_slot_by_candidate[pair_order] = (
-        cp.cumsum(pair_boundary, dtype=cp.int64) - 1
-    )
-    tree_slot_by_position = tree_slot_by_candidate[candidate_order]
-    distinct_tree_count = int(cp.count_nonzero(pair_boundary).item())
-    unique_pair_partitions = pair_partition[pair_boundary]
-    tree_counts = cp.bincount(
-        unique_pair_partitions, minlength=partition_count
-    ).astype(cp.int64, copy=False)
-    partition_tree_offsets = cp.concatenate((
-        cp.zeros(1, dtype=cp.int64),
-        cp.cumsum(tree_counts, dtype=cp.int64),
-    ))
-    maximum_trees = int(cp.max(tree_counts).item())
+    starts = cp.flatnonzero(boundary).astype(cp.int64, copy=False)
     return _PartitionLayout(
         candidate_order=candidate_order,
-        partition_offsets=partition_offsets,
-        partition_tree_offsets=partition_tree_offsets,
-        tree_slot_by_position=tree_slot_by_position,
-        partition_count=partition_count,
-        distinct_partition_tree_count=distinct_tree_count,
-        maximum_trees_per_partition=maximum_trees,
+        partition_offsets=cp.concatenate((
+            starts, cp.asarray([n], dtype=cp.int64),
+        )),
+        partition_count=int(starts.size),
     )
-
-
-def _shared_winner_policy(maximum_trees):
-    """Use at most half the device's per-block shared memory for winners."""
-
-    if maximum_trees <= 0:
-        return False, 0
-    properties = cp.cuda.runtime.getDeviceProperties(int(cp.cuda.Device().id))
-    shared_capacity = int(properties["sharedMemPerBlock"])
-    required = maximum_trees * np.dtype(np.uint64).itemsize
-    use_shared = required <= shared_capacity // 2
-    return use_shared, required if use_shared else 0
 
 
 def _timeout_nanoseconds(timeout_ms):
@@ -1345,13 +1226,12 @@ def _cluster_candidates_serial_oracle(decoded, geometry, *, config=None):
     Candidates are visited in deterministic decreasing-S/N order.  The loudest
     still-unassigned candidate seeds the next event.  Every still-unassigned row
     is compared only with that representative using
-    :func:`compatible_with_representative`.  For each compatible *other* tree,
-    the first row in global processing order -- therefore the loudest with
-    deterministic tie-breaking -- joins the event.  The seed and selected rows
-    are assigned permanently before the next seed is chosen.
+    :func:`compatible_with_representative`. All compatible rows join,
+    regardless of tree or primary family. The seed and selected rows are
+    assigned permanently before the next seed is chosen.
 
-    This construction guarantees one candidate per tree in an event.  It is not
-    transitive: a candidate compatible only with a nonrepresentative member does
+    This construction is not transitive: a candidate compatible only with a
+    nonrepresentative member does
     not join.  It is not complete-link: selected nonrepresentative members are
     not required to be mutually compatible.  These are intentional semantics,
     not approximations hidden by the implementation.
@@ -1365,10 +1245,9 @@ def _cluster_candidates_serial_oracle(decoded, geometry, *, config=None):
     -----------
     The serial control loop may compare a shrinking unassigned set for every
     event, giving O(N^2) representative-to-candidate predicate evaluations in
-    the worst case.  Stable ordering costs O(N log N); repeated CuPy unique
-    operations can add sorting cost beyond the quadratic predicate arithmetic
-    in adversarial dense inputs.  Persistent and per-iteration GPU storage are
-    O(N).  Seed/assignment decisions require O(N) scalar device synchronizations
+    the worst case. Stable ordering costs O(N log N). Persistent and
+    per-iteration GPU storage are O(N). Seed/assignment decisions require O(N)
+    scalar device synchronizations
     in the worst case, but no candidate-sized column is transferred to CPU.
     """
 
@@ -1394,23 +1273,13 @@ def _cluster_candidates_serial_oracle(decoded, geometry, *, config=None):
         seed = int(order[rank].item())
         if int(assignment[seed].item()) >= 0:
             continue
-        # Rebuild the still-unassigned view in global priority order.  Because
-        # compatibility requires a different tree, this view may include the
-        # seed without causing it to appear in the compatible subset.
-        unassigned = order[assignment[order] < 0]
+        # Keep the seed explicit, including at extreme floating-point limits
+        # where a zero difference times a cast-overflowed slope could be NaN.
+        unassigned = order[(assignment[order] < 0) & (order != seed)]
         compatible = unassigned[compatible_with_representative(
             candidates, seed, unassigned, geometry, config
         )]
-        if int(compatible.size):
-            # Filtering preserves global S/N order, so each first occurrence
-            # is the loudest compatible candidate from that tree.  cp.unique
-            # identifies those first positions; the seed is added explicitly.
-            _, first = cp.unique(candidates.tree[compatible], return_index=True)
-            selected = cp.concatenate((
-                order[rank:rank + 1], compatible[first]
-            ))
-        else:
-            selected = order[rank:rank + 1]
+        selected = cp.concatenate((order[rank:rank + 1], compatible))
         assignment[selected] = nevents
         representatives[nevents] = seed
         counts[nevents] = int(selected.size)
@@ -1501,25 +1370,23 @@ def cluster_candidates(
 
     Notes
     -----
-    One persistent block processes each independent
-    ``(beam_id, primary_tree_index)`` partition.  Within a partition the first
-    unassigned row in exact global priority order is the representative.  Every
-    later unassigned row is compared directly with that representative, and an
-    integer ``atomicMin`` keeps the earliest compatible row from each other
-    tree.  This is deliberately representative-seeded and non-transitive.
-    Compact GPU remapping then orders committed events by representative global
-    rank, reproducing the serial scientific construction exactly when complete.
+    One persistent block processes each independent beam partition. The
+    first unassigned row in exact global priority order is the representative.
+    Every later unassigned row is compared directly with it; all compatible
+    rows join, including same-tree and cross-family candidates. This is
+    deliberately representative-seeded and non-transitive. Compact remapping
+    restores global event order and reproduces the serial construction.
 
-    The deadline is initialized from CUDA's device-wide ``%globaltimer`` by the
-    first scheduled block and shared by the whole launch.  Blocks check before
-    representatives and between winner/scan tiles of at most 256 entries.  A
-    commit that has begun is allowed to finish so an event is never torn; the
-    cooperative deadline can consequently overshoot by one predicate tile plus
-    one parallel per-tree winner commit pass.  Kernel compilation, fixed GPU
-    sorting/layout work before the launch, and compact result construction after
-    it are outside this deadline.  The private work-tile keyword is solely a
-    deterministic GPU cancellation hook for focused single-partition tests;
-    its global counter is intentionally not a multi-partition scheduling API.
+    The first scheduled block initializes the launch-wide deadline from
+    CUDA's device-wide `%globaltimer`. Blocks check before representatives
+    and after comparison tiles of at most 256 entries. Membership writes are
+    provisional until the completed scan publishes a representative marker.
+    A cancelled scan therefore exposes none of its staged members. The final
+    block-size count reduction/commit is indivisible; the cooperative deadline
+    can overshoot by one comparison tile plus this fixed-size commit.
+    Compilation, GPU sorting/layout before the launch, and result construction
+    after it are outside the deadline. Private counters are deterministic
+    cancellation hooks for single-partition tests, not a scheduling API.
     """
 
     config = ClusteringTolerances() if config is None else config
@@ -1559,7 +1426,6 @@ def cluster_candidates(
 
     # Only hot predicate columns are gathered into partition priority order.
     # Reporting columns remain in the normalized candidate table.
-    ordered_tree = candidates.tree[candidate_order].astype(cp.int32, copy=False)
     ordered_dm = candidates.dm[candidate_order]
     ordered_toa = candidates.toa_sample_abs[candidate_order]
     ordered_dm_step = candidates.dm_step[candidate_order]
@@ -1568,13 +1434,6 @@ def cluster_candidates(
     provisional_by_position = cp.full(n, -1, dtype=cp.int64)
     provisional_representative = cp.full(n, -1, dtype=cp.int64)
     provisional_count = cp.zeros(n, dtype=cp.int32)
-    use_shared, shared_bytes = _shared_winner_policy(
-        layout.maximum_trees_per_partition
-    )
-    global_winners = cp.empty(
-        1 if use_shared else layout.distinct_partition_tree_count,
-        dtype=cp.uint64,
-    )
     launch_deadline_ns = cp.zeros(1, dtype=cp.uint64)
     completed_work_tiles = cp.zeros(1, dtype=cp.uint64)
     completed_events = cp.zeros(1, dtype=cp.uint64)
@@ -1585,10 +1444,7 @@ def cluster_candidates(
         (_THREADS_PER_BLOCK,),
         (
             layout.partition_offsets,
-            layout.partition_tree_offsets,
             candidate_order,
-            layout.tree_slot_by_position,
-            ordered_tree,
             ordered_dm,
             ordered_toa,
             ordered_dm_step,
@@ -1597,7 +1453,6 @@ def cluster_candidates(
             np.float64(config.time_padding_bins),
             np.float64(geometry.residual_slope_lo_samples_per_dm),
             np.float64(geometry.residual_slope_hi_samples_per_dm),
-            np.int32(use_shared),
             np.uint64(timeout_ns),
             np.int32(timeout_checks_enabled),
             np.int64(test_tile_limit),
@@ -1606,12 +1461,10 @@ def cluster_candidates(
             completed_work_tiles,
             completed_events,
             timeout_flag,
-            global_winners,
             provisional_by_position,
             provisional_representative,
             provisional_count,
         ),
-        shared_mem=shared_bytes,
     )
 
     # Synchronize one scalar launch status, never a candidate-sized column.
@@ -1634,7 +1487,8 @@ def cluster_candidates(
     nevents = int(ordered_slots.size)
 
     # Map provisional slots to compact event IDs.  The +1 offset gives the -1
-    # unassigned sentinel an explicit invalid lookup entry.
+    # unassigned sentinel an explicit invalid lookup entry. Staged rows from
+    # a cancelled scan point to an uncommitted slot, whose lookup is also -1.
     provisional_to_final = cp.full(n + 1, -1, dtype=cp.int64)
     provisional_to_final[ordered_slots + 1] = cp.arange(
         nevents, dtype=cp.int64

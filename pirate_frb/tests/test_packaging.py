@@ -44,9 +44,12 @@ _REQUIRED_PYFILES = (
     "pirate_frb/tests/test_packaging.py",
     "pirate_frb/tests/test_trigger_catalog.py",
 )
-_REQUIRED_DATA_FILES = (
+_CONFIG_DATA_FILES = (
     "pirate_frb/tests/data/toy.yml",
     "pirate_frb/tests/data/chord_sb2_et.yml",
+)
+_REQUIRED_DATA_FILES = _CONFIG_DATA_FILES + (
+    "pirate_frb/tests/data/clustering_trial_000317.json",
 )
 _LIVE_DATA_FILES = ("pirate_frb/tests/data/chord_8beams.yml", "pirate_frb/tests/data/xengine_metadata.yml")
 _REQUIRED_DISTRIBUTION_FILES = _REQUIRED_PYFILES + _REQUIRED_DATA_FILES + _LIVE_DATA_FILES
@@ -63,6 +66,9 @@ _REQUIRED_SDIST_ONLY_FILES = (
     "examples/simple_frb/generate.py",
     "examples/simple_frb/observation.yml",
     "examples/simple_frb/dedispersion.yml",
+    "examples/dm_boundary/README.md",
+    "examples/dm_boundary/run.py",
+    "examples/dm_boundary/observation.yml",
     "configs/grouper/example.yml",
     "examples/chord_8beams/observation.yml",
     "configs/dedispersion/chord_sb2_et.yml",
@@ -115,7 +121,7 @@ def test_grouper_modules_packaged():
     # config tree is intentionally absent from an isolated wheel target.
     source_config = repository / "configs" / "dedispersion"
     if source_config.is_dir():
-        for required in _REQUIRED_DATA_FILES:
+        for required in _CONFIG_DATA_FILES:
             packaged = repository / required
             authoritative = source_config / packaged.name
             assert packaged.read_bytes() == authoritative.read_bytes(), (

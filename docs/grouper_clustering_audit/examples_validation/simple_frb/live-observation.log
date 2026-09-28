@@ -1,0 +1,9 @@
+[observation] 1 beams, 65.431 s; no output files.
+[observation] Planned broadband_frb: beam=1 DM=500.0 S/N=50.0 TOA=40.0 s at 300.0 MHz band=300.0-1500.0 MHz
+[observation] Sent 8/32 science chunks.
+[observation] Sent 16/32 science chunks.
+[observation] Sent 24/32 science chunks.
+[observation] Sent 32/32 science chunks.
+[observation] Sent 32/32 science chunks.
+[observation] Sent 32/32 science chunks.
+[observation] Sending complete. Wait for the grouper's processing-complete message.

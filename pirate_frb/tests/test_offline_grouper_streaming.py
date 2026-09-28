@@ -249,6 +249,85 @@ def test_streaming_ownership_louder_next_chunk_and_no_i_plus_2_influence(
         ) == {0, 1}
 
 
+def test_streaming_consumes_all_same_tree_and_cross_primary_halo_members(
+        cuda_device_id=0):
+    """A louder halo representative owns all compatible rows exactly once."""
+
+    import cupy as cp
+
+    with cp.cuda.Device(cuda_device_id):
+        geometry = _geometry(cp)
+        decoder = _RawDecoder(cp, geometry)
+        owner = _raw(cp, [
+            {
+                "source_chunk_index": 0, "tree": 0, "idm": 20,
+                "itime": 6, "toa": 100, "snr": 20.0,
+            },
+            {
+                "source_chunk_index": 0, "tree": 0, "idm": 20,
+                "itime": 7, "toa": 100, "snr": 19.0,
+            },
+        ])
+        halo = _raw(cp, [
+            {
+                "source_chunk_index": 1, "tree": 2, "idm": 20,
+                "itime": 0, "toa": 100, "snr": 30.0,
+            },
+            {
+                "source_chunk_index": 1, "tree": 0, "idm": 20,
+                "itime": 1, "toa": 100, "snr": 29.0,
+            },
+            {
+                "source_chunk_index": 1, "tree": 0, "idm": 60,
+                "itime": 1, "toa": 400, "snr": 10.0,
+            },
+        ])
+        window, retained = runner._group_streaming_window(
+            cp, owner, halo, 0, 1, decoder, geometry,
+            ClusteringTolerances(), timeout_ms=0, timeout_policy="discard",
+        )
+
+        grouped = window.grouped
+        assert window.owner_source_chunk_index == 0
+        assert window.output_status == "complete"
+        assert len(grouped.events) == 1
+        assert cp.asnumpy(grouped.events.member_count).tolist() == [4]
+        assert cp.asnumpy(grouped.candidate_event_id).tolist() == [0] * 4
+        assert set(_candidate_signatures(cp, grouped)) == {
+            (0, 0, 20, 6), (0, 0, 20, 7),
+            (1, 2, 20, 0), (1, 0, 20, 1),
+        }
+        assert set(cp.asnumpy(
+            grouped.candidates.primary_tree_index
+        ).tolist()) == {0, 1}
+        assert sorted(cp.asnumpy(
+            grouped.members.candidate_index
+        ).tolist()) == list(range(4))
+        representative = int(
+            grouped.events.representative_candidate_index[0].item()
+        )
+        assert int(grouped.candidates.source_chunk_index[representative]) == 1
+        assert int(grouped.candidates.tree[representative]) == 2
+        assert float(grouped.events.snr[0]) == 30.0
+        assert _candidate_signatures(cp, retained) == [(1, 0, 60, 1)]
+
+        # The next owner receives only the future-only group. Both halo rows
+        # consumed by the earlier owner stay absent despite shared trees.
+        next_window, final_retained = runner._group_streaming_window(
+            cp, retained, GpuRawCandidates.empty(), 1, None,
+            decoder, geometry, ClusteringTolerances(),
+            timeout_ms=0, timeout_policy="discard",
+        )
+        assert len(next_window.grouped.events) == 1
+        assert _candidate_signatures(cp, next_window.grouped) == [(1, 0, 60, 1)]
+        assert len(final_retained) == 0
+        emitted = (
+            _candidate_signatures(cp, grouped)
+            + _candidate_signatures(cp, next_window.grouped)
+        )
+        assert len(emitted) == len(set(emitted)) == 5
+
+
 def test_streaming_timeout_policies_drop_backlog_and_keep_complete_events(
         cuda_device_id=0):
     """Discard emits nothing; partial emits one clean owner group only."""
@@ -259,14 +338,24 @@ def test_streaming_timeout_policies_drop_backlog_and_keep_complete_events(
         geometry = _geometry(cp)
         decoder = _RawDecoder(cp, geometry)
         config = ClusteringTolerances()
-        owner = _raw(cp, [{
-            "source_chunk_index": 0, "tree": 0, "idm": 20,
-            "itime": 7, "toa": 20, "snr": 20.0,
-        }])
+        owner = _raw(cp, [
+            {
+                "source_chunk_index": 0, "tree": 0, "idm": 20,
+                "itime": 7, "toa": 20, "snr": 20.0,
+            },
+            {
+                "source_chunk_index": 0, "tree": 0, "idm": 20,
+                "itime": 6, "toa": 20, "snr": 19.0,
+            },
+        ])
         halo = _raw(cp, [
             {
-                "source_chunk_index": 1, "tree": 1, "idm": 20,
+                "source_chunk_index": 1, "tree": 2, "idm": 20,
                 "itime": 0, "toa": 20, "snr": 30.0,
+            },
+            {
+                "source_chunk_index": 1, "tree": 0, "idm": 20,
+                "itime": 1, "toa": 20, "snr": 29.0,
             },
             {
                 "source_chunk_index": 1, "tree": 3, "idm": 50,
@@ -338,11 +427,17 @@ def test_streaming_timeout_policies_drop_backlog_and_keep_complete_events(
         assert partial.grouped.timed_out is True
         assert partial.grouped.complete is False
         assert len(partial.grouped.events) == 1
-        assert len(partial.grouped.candidates) == 2
+        assert len(partial.grouped.candidates) == 4
         assert set(cp.asnumpy(
             partial.grouped.candidates.source_chunk_index
         ).tolist()) == {0, 1}
-        assert cp.asnumpy(partial.grouped.events.member_count).tolist() == [2]
+        assert cp.asnumpy(partial.grouped.events.member_count).tolist() == [4]
+        assert sorted(cp.asnumpy(
+            partial.grouped.members.candidate_index
+        ).tolist()) == list(range(4))
+        assert set(cp.asnumpy(
+            partial.grouped.candidates.primary_tree_index
+        ).tolist()) == {0, 1}
         assert np.all(cp.asnumpy(partial.grouped.candidates.edge_flags) == 0)
         # The consumed committed halo row and unprocessed halo row are both
         # absent, so neither policy can create a growing retry backlog.

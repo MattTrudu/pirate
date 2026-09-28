@@ -1,0 +1,19 @@
+[observation] 8 beams, 220.830 s; no output files.
+[observation] Planned low_dm: beam=1 DM=100.0 S/N=50.0 TOA=90.0 s at 300.0 MHz band=300.0-1500.0 MHz
+[observation] Planned high_dm: beam=8 DM=2000.0 S/N=50.0 TOA=200.0 s at 300.0 MHz band=300.0-1500.0 MHz
+[observation] Planned narrow_band: beam=5 DM=550.0 S/N=50.0 TOA=50.0 s at 300.0 MHz band=500.0-1000.0 MHz
+[observation] Sent 8/108 science chunks.
+[observation] Sent 16/108 science chunks.
+[observation] Sent 24/108 science chunks.
+[observation] Sent 32/108 science chunks.
+[observation] Sent 40/108 science chunks.
+[observation] Sent 48/108 science chunks.
+[observation] Sent 56/108 science chunks.
+[observation] Sent 64/108 science chunks.
+[observation] Sent 72/108 science chunks.
+[observation] Sent 80/108 science chunks.
+[observation] Sent 88/108 science chunks.
+[observation] Sent 96/108 science chunks.
+[observation] Sent 104/108 science chunks.
+[observation] Sent 108/108 science chunks.
+[observation] Sending complete. Wait for the grouper's processing-complete message.

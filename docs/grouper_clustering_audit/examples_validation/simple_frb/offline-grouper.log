@@ -1,0 +1,35 @@
+summary grouping_window=0 beams=(1,) owner_chunk=0 events=0 grouping_timed_out=false output_status=complete
+summary grouping_window=1 beams=(1,) owner_chunk=1 events=0 grouping_timed_out=false output_status=complete
+summary grouping_window=2 beams=(1,) owner_chunk=2 events=0 grouping_timed_out=false output_status=complete
+summary grouping_window=3 beams=(1,) owner_chunk=3 events=0 grouping_timed_out=false output_status=complete
+summary grouping_window=4 beams=(1,) owner_chunk=4 events=0 grouping_timed_out=false output_status=complete
+summary grouping_window=5 beams=(1,) owner_chunk=5 events=0 grouping_timed_out=false output_status=complete
+summary grouping_window=6 beams=(1,) owner_chunk=6 events=0 grouping_timed_out=false output_status=complete
+summary grouping_window=7 beams=(1,) owner_chunk=7 events=0 grouping_timed_out=false output_status=complete
+summary grouping_window=8 beams=(1,) owner_chunk=8 events=0 grouping_timed_out=false output_status=complete
+summary grouping_window=9 beams=(1,) owner_chunk=9 events=0 grouping_timed_out=false output_status=complete
+summary grouping_window=10 beams=(1,) owner_chunk=10 events=0 grouping_timed_out=false output_status=complete
+summary grouping_window=11 beams=(1,) owner_chunk=11 events=0 grouping_timed_out=false output_status=complete
+summary grouping_window=12 beams=(1,) owner_chunk=12 events=0 grouping_timed_out=false output_status=complete
+summary grouping_window=13 beams=(1,) owner_chunk=13 events=0 grouping_timed_out=false output_status=complete
+summary grouping_window=14 beams=(1,) owner_chunk=14 events=0 grouping_timed_out=false output_status=complete
+summary grouping_window=15 beams=(1,) owner_chunk=15 events=0 grouping_timed_out=false output_status=complete
+summary grouping_window=16 beams=(1,) owner_chunk=16 events=0 grouping_timed_out=false output_status=complete
+summary grouping_window=17 beams=(1,) owner_chunk=17 events=0 grouping_timed_out=false output_status=complete
+summary grouping_window=18 beams=(1,) owner_chunk=18 events=0 grouping_timed_out=false output_status=complete
+event=0 grouping_window=19 grouping_timed_out=false beam=1 snr=46.0625 dm=499.997795 pc/cm3 toa=40.0000664147 s width=3 samples/2.9952 ms freq=[300,1500] MHz tree=0 token=0x00020301 chunk=19 idm=1385 itime=72 startup_incomplete=false members=1
+summary grouping_window=19 beams=(1,) owner_chunk=19 events=1 grouping_timed_out=false output_status=complete
+summary grouping_window=20 beams=(1,) owner_chunk=20 events=0 grouping_timed_out=false output_status=complete
+summary grouping_window=21 beams=(1,) owner_chunk=21 events=0 grouping_timed_out=false output_status=complete
+summary grouping_window=22 beams=(1,) owner_chunk=22 events=0 grouping_timed_out=false output_status=complete
+summary grouping_window=23 beams=(1,) owner_chunk=23 events=0 grouping_timed_out=false output_status=complete
+summary grouping_window=24 beams=(1,) owner_chunk=24 events=0 grouping_timed_out=false output_status=complete
+summary grouping_window=25 beams=(1,) owner_chunk=25 events=0 grouping_timed_out=false output_status=complete
+summary grouping_window=26 beams=(1,) owner_chunk=26 events=0 grouping_timed_out=false output_status=complete
+summary grouping_window=27 beams=(1,) owner_chunk=27 events=0 grouping_timed_out=false output_status=complete
+summary grouping_window=28 beams=(1,) owner_chunk=28 events=0 grouping_timed_out=false output_status=complete
+summary grouping_window=29 beams=(1,) owner_chunk=29 events=0 grouping_timed_out=false output_status=complete
+summary grouping_window=30 beams=(1,) owner_chunk=30 events=0 grouping_timed_out=false output_status=complete
+summary grouping_window=31 beams=(1,) owner_chunk=31 events=0 grouping_timed_out=false output_status=complete
+summary beams=(1,) chunks=32 windows=32 startup=authoritative complete=true
+catalog=/tmp/pirate-examples-20260928/simple-offline/events.asdf

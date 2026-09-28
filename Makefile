@@ -507,6 +507,7 @@ PYFILES = \
 OFFLINE_PEAK_TEST_DATA = \
   pirate_frb/tests/data/toy.yml \
   pirate_frb/tests/data/chord_sb2_et.yml \
+  pirate_frb/tests/data/clustering_trial_000317.json \
   pirate_frb/tests/data/chord_8beams.yml \
   pirate_frb/tests/data/xengine_metadata.yml
 
@@ -651,6 +652,7 @@ SDIST_FILES += README.md notes/install.md notes/grouper_modules.md configs/READM
 SDIST_FILES += environment_minimal.yml environment_dev.yml asdf-cxx/LICENSE.rst
 SDIST_FILES += examples/README.md examples/simple_frb/README.md examples/chord_8beams/README.md
 SDIST_FILES += examples/simple_frb/generate.py examples/simple_frb/observation.yml examples/simple_frb/dedispersion.yml
+SDIST_FILES += examples/dm_boundary/README.md examples/dm_boundary/run.py examples/dm_boundary/observation.yml
 SDIST_FILES += AIclassifier/README.md AIclassifier/requirements.txt AIclassifier/RetrieveEvent.ipynb
 SDIST_FILES += AIclassifier/data/events.asdf AIclassifier/data/frame_b1_t19_snrmap.asdf
 SDIST_FILES += grpc/finalize_grpc_stubs.py grpc/wrap_ndebug.py

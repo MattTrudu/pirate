@@ -1,0 +1,36 @@
+version: 1
+metadata: metadata.yml
+dedispersion: dedispersion.yml
+observation:
+  duration_seconds: 83.8
+  initial_chunk: 0
+  beam_ids:
+  - 0
+  noise_seed: 20260928
+dedispersion_overrides:
+  beams_per_batch: 1
+  num_active_batches: 1
+bursts:
+- id: first_primary_boundary
+  beam_id: 0
+  dm: 1478.537835445747
+  toa_seconds: 74.406582784
+  reference_frequency_MHz: 300.0
+  width_ms: 5.0
+  snr: 100.0
+  spectral_index: 0.0
+  subband_lo_MHz: 300.0
+  subband_hi_MHz: 1500.0
+grouper:
+  peakfinding:
+    snr_threshold: 10.0
+    dm_reach: 8
+    waist_bins: 1
+  grouping:
+    halo_size: 2
+    dm_tolerance: 1.5
+    time_tolerance: 1.5
+  execution:
+    beam_batch_size: 1
+    timeout_ms: 0
+    timeout_policy: discard

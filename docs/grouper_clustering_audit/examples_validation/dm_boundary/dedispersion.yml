@@ -1,0 +1,17 @@
+zone_nfreq: [8192, 8192, 6144, 2048, 3584]
+zone_freq_edges: [300, 350, 450, 600, 800, 1500]
+time_sample_ms: 0.99839999999999995
+toplevel_tree_rank: 16
+time_samples_per_chunk: 2048
+dtype: float16
+frequency_subband_counts: [5, 9, 7, 3, 1]
+primary_trees:
+  - {num_early_triggers: 0, max_width: 32, wt_dm_downsampling: 64, wt_time_downsampling: 64}
+  - {num_early_triggers: 1, max_width: 16, wt_dm_downsampling: 64, wt_time_downsampling: 64}
+  - {num_early_triggers: 2, max_width: 8, wt_dm_downsampling: 64, wt_time_downsampling: 64}
+  - {num_early_triggers: 3, max_width: 4, wt_dm_downsampling: 64, wt_time_downsampling: 64}
+beams_per_gpu: 1
+beams_per_batch: 1
+num_active_batches: 1
+future_write_max_samples: 464000
+max_gpu_clag: 5

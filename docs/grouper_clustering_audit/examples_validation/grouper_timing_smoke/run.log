@@ -1,0 +1,10 @@
+Warm-up complete on NVIDIA A40; starting Figure 6
+Figure 6: N=64, seed=20260924 complete
+Medians (ms): 1 beams: 1.777, 2 beams: 1.721, 10 beams: 1.650, 30 beams: 1.651, 60 beams: 1.669
+Figure 6: N=128, seed=20260924 complete
+Medians (ms): 1 beams: 1.896, 2 beams: 1.777, 10 beams: 1.686, 30 beams: 1.676, 60 beams: 1.646
+Figure 7: N=64, seed=20260924 complete
+Medians (ms): 2 beams: 54.309, 10 beams: 11.295, 20 beams: 5.426, 30 beams: 3.800, 60 beams: 2.239
+Figure 7: N=128, seed=20260924 complete
+Medians (ms): 2 beams: 57.290, 10 beams: 12.457, 20 beams: 6.321, 30 beams: 4.420, 60 beams: 2.358
+Saved 20 complete schedule timings to /home/mtrudu/src/pirate-1.5-integration/docs/grouper_clustering_audit/examples_validation/grouper_timing_smoke

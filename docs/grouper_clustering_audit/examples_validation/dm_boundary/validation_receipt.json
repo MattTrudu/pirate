@@ -1,0 +1,34 @@
+{
+  "command": [
+    "/home/mtrudu/software/miniforge3/envs/pirate-15-validation/bin/python",
+    "-B",
+    "-m",
+    "examples.dm_boundary.run",
+    "--output",
+    "docs/grouper_clustering_audit/examples_validation/dm_boundary",
+    "--gpu",
+    "1"
+  ],
+  "exit_code": 0,
+  "all_native_checks_passed": true,
+  "independent_catalog_validation": {
+    "event_count": 2,
+    "member_count": 3,
+    "event_member_counts": [
+      1,
+      2
+    ],
+    "member_trees": [
+      1,
+      0,
+      2
+    ],
+    "member_primary_families": [
+      1,
+      0,
+      1
+    ]
+  },
+  "elapsed_seconds": 61.41267448599683,
+  "before_fix_failure": "First native run failed catalog's obsolete same-primary-family validator; preserved in dm_boundary_before_catalog_fix.log. Rerun after fix passed."
+}

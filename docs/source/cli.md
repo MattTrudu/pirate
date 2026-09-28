@@ -107,6 +107,23 @@ duplicate keys, unsafe YAML tags, and values outside these domains fail before
 GPU work starts. The shown `400` ms timeout is an example, not a built-in
 default; the value in the supplied file is authoritative.
 
+### Candidate association
+
+The loudest unassigned candidate seeds each event. Every unassigned candidate
+in the same beam that satisfies the DM/time predicate joins that seed, including
+multiple peaks from one tree and peaks across primary-tree DM boundaries.
+Tree identity and primary family remain provenance and resolution metadata,
+not association vetoes. Members are compared directly with the representative;
+compatibility through another member cannot extend an event. Event parameters
+and flags come from the representative, while all member measurements remain
+available. The persistent CUDA kernel partitions by beam and commits an event
+only after its complete membership scan.
+
+Association is local to the window described below. It does not wait for later
+early-trigger/full-band reports or maintain a long-term deduplication history.
+Performance measurements made with the former one-member-per-tree algorithm
+must be repeated before being used for this implementation.
+
 ### Streaming ownership and timeout behavior
 
 Grouping is bounded to adjacent chunks. A window contains candidates owned by

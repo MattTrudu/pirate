@@ -4,6 +4,12 @@ The grouper is the complete peakfinding, decoding and clustering pipeline.
 Clustering is the stage that associates decoded candidates into events.
 Offline and online adapters use the same processing implementation.
 
+Clustering is seeded by the loudest remaining candidate and gathers all directly
+compatible candidates in the same beam. Same-tree peaks and candidates across
+primary-tree DM boundaries may share an event. Tree/family labels do not veto
+association or limit membership. DM/time tolerances, representative-derived
+measurements, bounded window ownership and early-trigger delivery are preserved.
+
 ## Processing modules
 
 | Module | Responsibility |

@@ -1,0 +1,8 @@
+[event_monitor] 8 beams, 220.830 s; no output files.
+[event_monitor] Listening at 127.0.0.1:21803; prints only. Ctrl-C to stop.
+[event_monitor] beam=5 tree=0 DM=550.1536 S/N=41.656 sub-band=474.342-750.000 MHz TOA=50.004982 s (at 300 MHz, from observation start)
+[event_monitor] beam=1 tree=0 DM=99.9905 S/N=47.156 sub-band=300.000-1500.000 MHz TOA=89.999805 s (at 300 MHz, from observation start)
+[event_monitor] beam=8 tree=1 DM=2000.0217 S/N=35.219 sub-band=416.025-1500.000 MHz TOA=200.001516 s (at 300 MHz, from observation start)
+[event_monitor] beam=8 tree=2 DM=1999.9912 S/N=50.344 sub-band=300.000-1500.000 MHz TOA=200.000164 s (at 300 MHz, from observation start)
+[event_monitor] Printed 4 detection(s).
+[event_monitor] Stopped.

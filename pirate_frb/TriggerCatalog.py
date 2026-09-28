@@ -794,8 +794,8 @@ def _validate_metadata(metadata, coverage, events, members):
 
     # Every published event is owned by at least one member from the window's
     # owner chunk, even if its representative (and event projection) is from
-    # the louder next-chunk halo.  Members also remain inside one independent
-    # beam/primary-tree domain and one provenance window.
+    # the louder next-chunk halo. Members remain in one beam and provenance
+    # window; tree and primary-family labels do not restrict association.
     for event_row, event_id in enumerate(events["event_id"]):
         member_rows = members["event_id"] == event_id
         window_id = int(events["grouping_window_id"][event_row])
@@ -807,10 +807,6 @@ def _validate_metadata(metadata, coverage, events, members):
                 or not np.all(
                     members["beam_id"][member_rows]
                     == events["beam_id"][event_row]
-                )
-                or not np.all(
-                    members["primary_tree_index"][member_rows]
-                    == events["primary_tree_index"][event_row]
                 )):
             raise ValueError("event members cross a grouping domain or window")
 

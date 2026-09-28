@@ -1,0 +1,36 @@
+Found 1 beam(s) in /tmp/pirate-examples-20260928/simple-offline/frames: [1]
+
+Beam 1: 32 chunks
+  nfreq=28160, nt_in=2048, ntrees=1, dtype=float16, time_sample_ms=0.9984
+  beam 1  chunk   0 (tci=  0):  snr_max=  5.215  saved=/tmp/pirate-examples-20260928/simple-offline/frames/frame_b1_t0_snrmap.asdf
+  beam 1  chunk   1 (tci=  1):  snr_max=  5.062  saved=/tmp/pirate-examples-20260928/simple-offline/frames/frame_b1_t1_snrmap.asdf
+  beam 1  chunk   2 (tci=  2):  snr_max=  5.477  saved=/tmp/pirate-examples-20260928/simple-offline/frames/frame_b1_t2_snrmap.asdf
+  beam 1  chunk   3 (tci=  3):  snr_max=  5.613  saved=/tmp/pirate-examples-20260928/simple-offline/frames/frame_b1_t3_snrmap.asdf
+  beam 1  chunk   4 (tci=  4):  snr_max=  5.605  saved=/tmp/pirate-examples-20260928/simple-offline/frames/frame_b1_t4_snrmap.asdf
+  beam 1  chunk   5 (tci=  5):  snr_max=  6.086  saved=/tmp/pirate-examples-20260928/simple-offline/frames/frame_b1_t5_snrmap.asdf
+  beam 1  chunk   6 (tci=  6):  snr_max=  5.465  saved=/tmp/pirate-examples-20260928/simple-offline/frames/frame_b1_t6_snrmap.asdf
+  beam 1  chunk   7 (tci=  7):  snr_max=  5.645  saved=/tmp/pirate-examples-20260928/simple-offline/frames/frame_b1_t7_snrmap.asdf
+  beam 1  chunk   8 (tci=  8):  snr_max=  5.781  saved=/tmp/pirate-examples-20260928/simple-offline/frames/frame_b1_t8_snrmap.asdf
+  beam 1  chunk   9 (tci=  9):  snr_max=  5.594  saved=/tmp/pirate-examples-20260928/simple-offline/frames/frame_b1_t9_snrmap.asdf
+  beam 1  chunk  10 (tci= 10):  snr_max=  5.520  saved=/tmp/pirate-examples-20260928/simple-offline/frames/frame_b1_t10_snrmap.asdf
+  beam 1  chunk  11 (tci= 11):  snr_max=  5.699  saved=/tmp/pirate-examples-20260928/simple-offline/frames/frame_b1_t11_snrmap.asdf
+  beam 1  chunk  12 (tci= 12):  snr_max=  5.621  saved=/tmp/pirate-examples-20260928/simple-offline/frames/frame_b1_t12_snrmap.asdf
+  beam 1  chunk  13 (tci= 13):  snr_max=  5.648  saved=/tmp/pirate-examples-20260928/simple-offline/frames/frame_b1_t13_snrmap.asdf
+  beam 1  chunk  14 (tci= 14):  snr_max=  5.855  saved=/tmp/pirate-examples-20260928/simple-offline/frames/frame_b1_t14_snrmap.asdf
+  beam 1  chunk  15 (tci= 15):  snr_max=  5.793  saved=/tmp/pirate-examples-20260928/simple-offline/frames/frame_b1_t15_snrmap.asdf
+  beam 1  chunk  16 (tci= 16):  snr_max=  5.914  saved=/tmp/pirate-examples-20260928/simple-offline/frames/frame_b1_t16_snrmap.asdf
+  beam 1  chunk  17 (tci= 17):  snr_max=  5.809  saved=/tmp/pirate-examples-20260928/simple-offline/frames/frame_b1_t17_snrmap.asdf
+  beam 1  chunk  18 (tci= 18):  snr_max=  5.758  saved=/tmp/pirate-examples-20260928/simple-offline/frames/frame_b1_t18_snrmap.asdf
+  beam 1  chunk  19 (tci= 19):  snr_max= 46.062  saved=/tmp/pirate-examples-20260928/simple-offline/frames/frame_b1_t19_snrmap.asdf
+  beam 1  chunk  20 (tci= 20):  snr_max=  5.637  saved=/tmp/pirate-examples-20260928/simple-offline/frames/frame_b1_t20_snrmap.asdf
+  beam 1  chunk  21 (tci= 21):  snr_max=  5.594  saved=/tmp/pirate-examples-20260928/simple-offline/frames/frame_b1_t21_snrmap.asdf
+  beam 1  chunk  22 (tci= 22):  snr_max=  5.895  saved=/tmp/pirate-examples-20260928/simple-offline/frames/frame_b1_t22_snrmap.asdf
+  beam 1  chunk  23 (tci= 23):  snr_max=  5.855  saved=/tmp/pirate-examples-20260928/simple-offline/frames/frame_b1_t23_snrmap.asdf
+  beam 1  chunk  24 (tci= 24):  snr_max=  5.805  saved=/tmp/pirate-examples-20260928/simple-offline/frames/frame_b1_t24_snrmap.asdf
+  beam 1  chunk  25 (tci= 25):  snr_max=  6.055  saved=/tmp/pirate-examples-20260928/simple-offline/frames/frame_b1_t25_snrmap.asdf
+  beam 1  chunk  26 (tci= 26):  snr_max=  6.258  saved=/tmp/pirate-examples-20260928/simple-offline/frames/frame_b1_t26_snrmap.asdf
+  beam 1  chunk  27 (tci= 27):  snr_max=  5.945  saved=/tmp/pirate-examples-20260928/simple-offline/frames/frame_b1_t27_snrmap.asdf
+  beam 1  chunk  28 (tci= 28):  snr_max=  6.012  saved=/tmp/pirate-examples-20260928/simple-offline/frames/frame_b1_t28_snrmap.asdf
+  beam 1  chunk  29 (tci= 29):  snr_max=  5.664  saved=/tmp/pirate-examples-20260928/simple-offline/frames/frame_b1_t29_snrmap.asdf
+  beam 1  chunk  30 (tci= 30):  snr_max=  5.863  saved=/tmp/pirate-examples-20260928/simple-offline/frames/frame_b1_t30_snrmap.asdf
+  beam 1  chunk  31 (tci= 31):  snr_max=  5.801  saved=/tmp/pirate-examples-20260928/simple-offline/frames/frame_b1_t31_snrmap.asdf

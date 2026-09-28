@@ -1,0 +1,11 @@
+[dedisperser] 8 beams, 220.830 s; no output files.
+[dedisperser] Waiting for grouper.
+FrbServer: connected to grouper at 127.0.0.1:21802
+FrbServer: waiting for X-engine node(s) to connect at 127.0.0.1:21801 (Ctrl-C to stop)
+[dedisperser] Listening. After grouper reports complete, stop this terminal first (Ctrl-C).
+FrbServer: DedispersionPlan constructed in 0.777909 sec (nfreq=28160, ntrees=10)
+FrbServer: GpuDedisperser constructed in 0.000202818 sec (nstreams=1)
+FrbServer: GpuDedisperser::allocate() done in 0.00472121 sec (gmem=6743936000 B, hmem=53190166784 B)
+FrbServer: calling fill_analytic_weights() ...
+FrbServer: filled analytic dedisperser weights in 0.740268 sec
+[dedisperser] Stopped.

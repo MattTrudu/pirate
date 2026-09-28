@@ -1,0 +1,225 @@
+dtype: float16
+nfreq: 28160
+nt_in: 2048
+toplevel_tree_rank: 16
+num_primary_trees: 4
+beams_per_gpu: 1
+beams_per_batch: 1
+num_active_batches: 1
+stage1_dd_rank: [8, 7, 7, 7]
+stage1_amb_rank: [8, 8, 8, 8]
+ntrees: 10
+
+trees:
+
+  - tree_index: 0
+    ndm_out: 4096
+    nt_out: 128
+    dm_min: 0
+    dm_max: 1478.5378354457471
+    trigger_frequency: 300
+    primary_tree_index: 0
+    early_trigger_level: 0
+    amb_rank: 8
+    dd_rank: 8
+    nt_ds: 2048
+    max_width: 32
+    dm_downsampling: 16
+    time_downsampling: 16
+    nprofiles: 16
+    wt_dm_downsampling: 64
+    wt_time_downsampling: 64
+    ndm_wt: 1024
+    nt_wt: 32
+    frequency_subband_counts: [5, 9, 7, 3, 1]
+
+  - tree_index: 1
+    ndm_out: 1024
+    nt_out: 64
+    dm_min: 1478.5378354457471
+    dm_max: 2957.0756708914942
+    trigger_frequency: 416.02514716892182
+    primary_tree_index: 1
+    early_trigger_level: 1
+    amb_rank: 7
+    dd_rank: 7
+    nt_ds: 1024
+    max_width: 16
+    dm_downsampling: 16
+    time_downsampling: 16
+    nprofiles: 13
+    wt_dm_downsampling: 64
+    wt_time_downsampling: 64
+    ndm_wt: 256
+    nt_wt: 16
+    frequency_subband_counts: [5, 7, 3, 1]
+
+  - tree_index: 2
+    ndm_out: 2048
+    nt_out: 64
+    dm_min: 1478.5378354457471
+    dm_max: 2957.0756708914942
+    trigger_frequency: 300
+    primary_tree_index: 1
+    early_trigger_level: 0
+    amb_rank: 7
+    dd_rank: 8
+    nt_ds: 1024
+    max_width: 16
+    dm_downsampling: 16
+    time_downsampling: 16
+    nprofiles: 13
+    wt_dm_downsampling: 64
+    wt_time_downsampling: 64
+    ndm_wt: 512
+    nt_wt: 16
+    frequency_subband_counts: [5, 9, 7, 3, 1]
+
+  - tree_index: 3
+    ndm_out: 1024
+    nt_out: 64
+    dm_min: 2957.0756708914942
+    dm_max: 5914.1513417829883
+    trigger_frequency: 566.9467095138408
+    primary_tree_index: 2
+    early_trigger_level: 2
+    amb_rank: 7
+    dd_rank: 6
+    nt_ds: 512
+    max_width: 8
+    dm_downsampling: 8
+    time_downsampling: 8
+    nprofiles: 10
+    wt_dm_downsampling: 64
+    wt_time_downsampling: 64
+    ndm_wt: 128
+    nt_wt: 8
+    frequency_subband_counts: [4, 3, 1]
+
+  - tree_index: 4
+    ndm_out: 1024
+    nt_out: 32
+    dm_min: 2957.0756708914942
+    dm_max: 5914.1513417829883
+    trigger_frequency: 416.02514716892182
+    primary_tree_index: 2
+    early_trigger_level: 1
+    amb_rank: 7
+    dd_rank: 7
+    nt_ds: 512
+    max_width: 8
+    dm_downsampling: 16
+    time_downsampling: 16
+    nprofiles: 10
+    wt_dm_downsampling: 64
+    wt_time_downsampling: 64
+    ndm_wt: 256
+    nt_wt: 8
+    frequency_subband_counts: [5, 7, 3, 1]
+
+  - tree_index: 5
+    ndm_out: 2048
+    nt_out: 32
+    dm_min: 2957.0756708914942
+    dm_max: 5914.1513417829883
+    trigger_frequency: 300
+    primary_tree_index: 2
+    early_trigger_level: 0
+    amb_rank: 7
+    dd_rank: 8
+    nt_ds: 512
+    max_width: 8
+    dm_downsampling: 16
+    time_downsampling: 16
+    nprofiles: 10
+    wt_dm_downsampling: 64
+    wt_time_downsampling: 64
+    ndm_wt: 512
+    nt_wt: 8
+    frequency_subband_counts: [5, 9, 7, 3, 1]
+
+  - tree_index: 6
+    ndm_out: 512
+    nt_out: 32
+    dm_min: 5914.1513417829883
+    dm_max: 11828.302683565977
+    trigger_frequency: 750
+    primary_tree_index: 3
+    early_trigger_level: 3
+    amb_rank: 7
+    dd_rank: 5
+    nt_ds: 256
+    max_width: 4
+    dm_downsampling: 8
+    time_downsampling: 8
+    nprofiles: 7
+    wt_dm_downsampling: 64
+    wt_time_downsampling: 64
+    ndm_wt: 64
+    nt_wt: 4
+    frequency_subband_counts: [2, 1]
+
+  - tree_index: 7
+    ndm_out: 1024
+    nt_out: 32
+    dm_min: 5914.1513417829883
+    dm_max: 11828.302683565977
+    trigger_frequency: 566.9467095138408
+    primary_tree_index: 3
+    early_trigger_level: 2
+    amb_rank: 7
+    dd_rank: 6
+    nt_ds: 256
+    max_width: 4
+    dm_downsampling: 8
+    time_downsampling: 8
+    nprofiles: 7
+    wt_dm_downsampling: 64
+    wt_time_downsampling: 64
+    ndm_wt: 128
+    nt_wt: 4
+    frequency_subband_counts: [4, 3, 1]
+
+  - tree_index: 8
+    ndm_out: 1024
+    nt_out: 16
+    dm_min: 5914.1513417829883
+    dm_max: 11828.302683565977
+    trigger_frequency: 416.02514716892182
+    primary_tree_index: 3
+    early_trigger_level: 1
+    amb_rank: 7
+    dd_rank: 7
+    nt_ds: 256
+    max_width: 4
+    dm_downsampling: 16
+    time_downsampling: 16
+    nprofiles: 7
+    wt_dm_downsampling: 64
+    wt_time_downsampling: 64
+    ndm_wt: 256
+    nt_wt: 4
+    frequency_subband_counts: [5, 7, 3, 1]
+
+  - tree_index: 9
+    ndm_out: 2048
+    nt_out: 16
+    dm_min: 5914.1513417829883
+    dm_max: 11828.302683565977
+    trigger_frequency: 300
+    primary_tree_index: 3
+    early_trigger_level: 0
+    amb_rank: 7
+    dd_rank: 8
+    nt_ds: 256
+    max_width: 4
+    dm_downsampling: 16
+    time_downsampling: 16
+    nprofiles: 7
+    wt_dm_downsampling: 64
+    wt_time_downsampling: 64
+    ndm_wt: 512
+    nt_wt: 4
+    frequency_subband_counts: [5, 9, 7, 3, 1]
+
+dedispersion_outputs: 0.003 GB/s

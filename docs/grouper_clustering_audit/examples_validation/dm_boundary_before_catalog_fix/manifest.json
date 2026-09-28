@@ -1,0 +1,126 @@
+{
+  "recipe_source": "/home/mtrudu/src/pirate-1.5-integration/examples/dm_boundary/observation.yml",
+  "truth": {
+    "id": "first_primary_boundary",
+    "beam_id": 0,
+    "dm": 1478.537835445747,
+    "toa_seconds": 74.406582784,
+    "reference_frequency_MHz": 300.0,
+    "width_ms": 5.0,
+    "snr": 100.0,
+    "spectral_index": 0.0,
+    "subband_lo_MHz": 300.0,
+    "subband_hi_MHz": 1500.0
+  },
+  "boundary_dm": 1478.537835445747,
+  "boundary_tree_ids": [
+    0,
+    2
+  ],
+  "boundary_idm": [
+    4095,
+    0
+  ],
+  "time_sample_ms": 0.9984,
+  "samples_per_chunk": 2048,
+  "nchunks": 41,
+  "noise_seed": 20260928,
+  "tree_geometry": [
+    {
+      "tree": 0,
+      "primary_tree_index": 0,
+      "early_trigger_level": 0,
+      "dm_min": 0.0,
+      "dm_max": 1478.537835445747,
+      "ndm_out": 4096
+    },
+    {
+      "tree": 1,
+      "primary_tree_index": 1,
+      "early_trigger_level": 1,
+      "dm_min": 1478.537835445747,
+      "dm_max": 2957.075670891494,
+      "ndm_out": 1024
+    },
+    {
+      "tree": 2,
+      "primary_tree_index": 1,
+      "early_trigger_level": 0,
+      "dm_min": 1478.537835445747,
+      "dm_max": 2957.075670891494,
+      "ndm_out": 2048
+    },
+    {
+      "tree": 3,
+      "primary_tree_index": 2,
+      "early_trigger_level": 2,
+      "dm_min": 2957.075670891494,
+      "dm_max": 5914.151341782988,
+      "ndm_out": 1024
+    },
+    {
+      "tree": 4,
+      "primary_tree_index": 2,
+      "early_trigger_level": 1,
+      "dm_min": 2957.075670891494,
+      "dm_max": 5914.151341782988,
+      "ndm_out": 1024
+    },
+    {
+      "tree": 5,
+      "primary_tree_index": 2,
+      "early_trigger_level": 0,
+      "dm_min": 2957.075670891494,
+      "dm_max": 5914.151341782988,
+      "ndm_out": 2048
+    },
+    {
+      "tree": 6,
+      "primary_tree_index": 3,
+      "early_trigger_level": 3,
+      "dm_min": 5914.151341782988,
+      "dm_max": 11828.302683565977,
+      "ndm_out": 512
+    },
+    {
+      "tree": 7,
+      "primary_tree_index": 3,
+      "early_trigger_level": 2,
+      "dm_min": 5914.151341782988,
+      "dm_max": 11828.302683565977,
+      "ndm_out": 1024
+    },
+    {
+      "tree": 8,
+      "primary_tree_index": 3,
+      "early_trigger_level": 1,
+      "dm_min": 5914.151341782988,
+      "dm_max": 11828.302683565977,
+      "ndm_out": 1024
+    },
+    {
+      "tree": 9,
+      "primary_tree_index": 3,
+      "early_trigger_level": 0,
+      "dm_min": 5914.151341782988,
+      "dm_max": 11828.302683565977,
+      "ndm_out": 2048
+    }
+  ],
+  "plan_yaml": "dtype: float16\nnfreq: 28160\nnt_in: 2048\ntoplevel_tree_rank: 16\nnum_primary_trees: 4\nbeams_per_gpu: 1\nbeams_per_batch: 1\nnum_active_batches: 1\nstage1_dd_rank: [8, 7, 7, 7]\nstage1_amb_rank: [8, 8, 8, 8]\nntrees: 10\n\ntrees:\n\n  - tree_index: 0\n    ndm_out: 4096\n    nt_out: 128\n    dm_min: 0\n    dm_max: 1478.5378354457471\n    trigger_frequency: 300\n    primary_tree_index: 0\n    early_trigger_level: 0\n    amb_rank: 8\n    dd_rank: 8\n    nt_ds: 2048\n    max_width: 32\n    dm_downsampling: 16\n    time_downsampling: 16\n    nprofiles: 16\n    wt_dm_downsampling: 64\n    wt_time_downsampling: 64\n    ndm_wt: 1024\n    nt_wt: 32\n    frequency_subband_counts: [5, 9, 7, 3, 1]\n\n  - tree_index: 1\n    ndm_out: 1024\n    nt_out: 64\n    dm_min: 1478.5378354457471\n    dm_max: 2957.0756708914942\n    trigger_frequency: 416.02514716892182\n    primary_tree_index: 1\n    early_trigger_level: 1\n    amb_rank: 7\n    dd_rank: 7\n    nt_ds: 1024\n    max_width: 16\n    dm_downsampling: 16\n    time_downsampling: 16\n    nprofiles: 13\n    wt_dm_downsampling: 64\n    wt_time_downsampling: 64\n    ndm_wt: 256\n    nt_wt: 16\n    frequency_subband_counts: [5, 7, 3, 1]\n\n  - tree_index: 2\n    ndm_out: 2048\n    nt_out: 64\n    dm_min: 1478.5378354457471\n    dm_max: 2957.0756708914942\n    trigger_frequency: 300\n    primary_tree_index: 1\n    early_trigger_level: 0\n    amb_rank: 7\n    dd_rank: 8\n    nt_ds: 1024\n    max_width: 16\n    dm_downsampling: 16\n    time_downsampling: 16\n    nprofiles: 13\n    wt_dm_downsampling: 64\n    wt_time_downsampling: 64\n    ndm_wt: 512\n    nt_wt: 16\n    frequency_subband_counts: [5, 9, 7, 3, 1]\n\n  - tree_index: 3\n    ndm_out: 1024\n    nt_out: 64\n    dm_min: 2957.0756708914942\n    dm_max: 5914.1513417829883\n    trigger_frequency: 566.9467095138408\n    primary_tree_index: 2\n    early_trigger_level: 2\n    amb_rank: 7\n    dd_rank: 6\n    nt_ds: 512\n    max_width: 8\n    dm_downsampling: 8\n    time_downsampling: 8\n    nprofiles: 10\n    wt_dm_downsampling: 64\n    wt_time_downsampling: 64\n    ndm_wt: 128\n    nt_wt: 8\n    frequency_subband_counts: [4, 3, 1]\n\n  - tree_index: 4\n    ndm_out: 1024\n    nt_out: 32\n    dm_min: 2957.0756708914942\n    dm_max: 5914.1513417829883\n    trigger_frequency: 416.02514716892182\n    primary_tree_index: 2\n    early_trigger_level: 1\n    amb_rank: 7\n    dd_rank: 7\n    nt_ds: 512\n    max_width: 8\n    dm_downsampling: 16\n    time_downsampling: 16\n    nprofiles: 10\n    wt_dm_downsampling: 64\n    wt_time_downsampling: 64\n    ndm_wt: 256\n    nt_wt: 8\n    frequency_subband_counts: [5, 7, 3, 1]\n\n  - tree_index: 5\n    ndm_out: 2048\n    nt_out: 32\n    dm_min: 2957.0756708914942\n    dm_max: 5914.1513417829883\n    trigger_frequency: 300\n    primary_tree_index: 2\n    early_trigger_level: 0\n    amb_rank: 7\n    dd_rank: 8\n    nt_ds: 512\n    max_width: 8\n    dm_downsampling: 16\n    time_downsampling: 16\n    nprofiles: 10\n    wt_dm_downsampling: 64\n    wt_time_downsampling: 64\n    ndm_wt: 512\n    nt_wt: 8\n    frequency_subband_counts: [5, 9, 7, 3, 1]\n\n  - tree_index: 6\n    ndm_out: 512\n    nt_out: 32\n    dm_min: 5914.1513417829883\n    dm_max: 11828.302683565977\n    trigger_frequency: 750\n    primary_tree_index: 3\n    early_trigger_level: 3\n    amb_rank: 7\n    dd_rank: 5\n    nt_ds: 256\n    max_width: 4\n    dm_downsampling: 8\n    time_downsampling: 8\n    nprofiles: 7\n    wt_dm_downsampling: 64\n    wt_time_downsampling: 64\n    ndm_wt: 64\n    nt_wt: 4\n    frequency_subband_counts: [2, 1]\n\n  - tree_index: 7\n    ndm_out: 1024\n    nt_out: 32\n    dm_min: 5914.1513417829883\n    dm_max: 11828.302683565977\n    trigger_frequency: 566.9467095138408\n    primary_tree_index: 3\n    early_trigger_level: 2\n    amb_rank: 7\n    dd_rank: 6\n    nt_ds: 256\n    max_width: 4\n    dm_downsampling: 8\n    time_downsampling: 8\n    nprofiles: 7\n    wt_dm_downsampling: 64\n    wt_time_downsampling: 64\n    ndm_wt: 128\n    nt_wt: 4\n    frequency_subband_counts: [4, 3, 1]\n\n  - tree_index: 8\n    ndm_out: 1024\n    nt_out: 16\n    dm_min: 5914.1513417829883\n    dm_max: 11828.302683565977\n    trigger_frequency: 416.02514716892182\n    primary_tree_index: 3\n    early_trigger_level: 1\n    amb_rank: 7\n    dd_rank: 7\n    nt_ds: 256\n    max_width: 4\n    dm_downsampling: 16\n    time_downsampling: 16\n    nprofiles: 7\n    wt_dm_downsampling: 64\n    wt_time_downsampling: 64\n    ndm_wt: 256\n    nt_wt: 4\n    frequency_subband_counts: [5, 7, 3, 1]\n\n  - tree_index: 9\n    ndm_out: 2048\n    nt_out: 16\n    dm_min: 5914.1513417829883\n    dm_max: 11828.302683565977\n    trigger_frequency: 300\n    primary_tree_index: 3\n    early_trigger_level: 0\n    amb_rank: 7\n    dd_rank: 8\n    nt_ds: 256\n    max_width: 4\n    dm_downsampling: 16\n    time_downsampling: 16\n    nprofiles: 7\n    wt_dm_downsampling: 64\n    wt_time_downsampling: 64\n    ndm_wt: 512\n    nt_wt: 4\n    frequency_subband_counts: [5, 9, 7, 3, 1]\n\ndedispersion_outputs: 0.003 GB/s",
+  "python": "3.11.15 | packaged by conda-forge | (main, Jun 11 2026, 03:34:02) [GCC 14.3.0]",
+  "python_executable": "/home/mtrudu/software/miniforge3/envs/pirate-15-validation/bin/python",
+  "source_sha256": {
+    "Clustering.py": "db200ae4cd205fae521d1d100b527f56e0a341ff0f87bfc0ec29f11e21500b71",
+    "BowtiePeakfinding.py": "4b87556c0cafd8cdcedb27289da83dec1fb564bffb0d306cb85141140b4c4b79",
+    "GpuArgmaxDecoder.py": "117982404ee46777b8dc368ff776f74e677fee8b478e0a062e25b5956290ed1b",
+    "GrouperPipeline.py": "863b6efde3d7f4f1b30d6aa56b2b7128dfc22b7fd3ca8c0fc08b81955b97a735",
+    "OfflineDedisperser.py": "da6329237329c8df177f5c63aeda5e3f1a792123076975a2e9d8d15a8a11ded6",
+    "LivePipeline.py": "e4665f8f0ea9b1635af80ef444ff80f9bf01d59152fbb9b6b49592fd84e19b11",
+    "Observation.py": "65fa78d38293a10664f2bd61babfcce131873a903ee34ed5d5e6a1df24877115",
+    "example": "a70fa1132955d501b2712e32d27964f402dd9a829e1e64fa6eee0dd2923b111a",
+    "recipe": "17620f12f1682b812270f3ec03d7ae6dc5543048a0f718dccb30e6df0fc60294",
+    "metadata": "be94bd29e289923c9ddaa2ce1e251aa071398fd85ed6ae3b897c610852f9bcc0",
+    "dedispersion": "efafaef44f6652efec29e062178a3f270dfaf62734307a5e58b92879579cab56"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "command": [
+    "/home/mtrudu/software/miniforge3/envs/pirate-15-validation/bin/python",
+    "-B",
+    "examples/frb_recovery/test_run.py"
+  ],
+  "exit_code": 0,
+  "tests": 11,
+  "status": "passed",
+  "scope": "CPU checks of the recovery example; not a new native recovery campaign",
+  "script_sha256": "7c498f9a3a5774f3aa289c22dda99f8f22cfb3b3d053742f5b7f3ec6b06883b6"
+}

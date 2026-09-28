@@ -7,6 +7,7 @@ with its native dependencies, NVIDIA GPU and compiled CHORD kernels available.
 | --- | --- | --- |
 | [One beam](simple_frb/README.md) | [observation.yml](simple_frb/observation.yml) | One broadband FRB, DM 500, Gaussian sigma 1 ms, injected S/N 50. Start here for offline and online instructions. |
 | [Eight beams](chord_8beams/README.md) | [observation.yml](chord_8beams/observation.yml) | Live search with three broadband/narrowband bursts and subband/early-trigger trees. |
+| [FRB at a DM boundary](dm_boundary/README.md) | [observation.yml](dm_boundary/observation.yml) | One native burst at the first primary-tree boundary; verifies that peaks from both trees become members of one event. |
 
 The [classifier window notebook](../AIclassifier/README.md) uses a small saved
 result from the one-beam example to locate an event and extract its DM-time

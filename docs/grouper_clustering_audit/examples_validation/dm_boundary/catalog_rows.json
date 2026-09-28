@@ -1,0 +1,495 @@
+{
+  "events": [
+    {
+      "event_id": 0,
+      "representative_candidate_id": 0,
+      "grouping_window_id": 20,
+      "grouping_timed_out": false,
+      "source_chunk_index": 20,
+      "member_count": 1,
+      "beam_id": 0,
+      "primary_tree_index": 1,
+      "tree": 1,
+      "idm": 0,
+      "itime": 25,
+      "snr": 70.125,
+      "dm": 1478.7634493004555,
+      "toa_sample_abs": 74533.50022888882,
+      "width_samp": 12.0,
+      "width_ms": 11.980799999999999,
+      "freq_lo_MHz": 416.0251471689218,
+      "freq_hi_MHz": 1500.0,
+      "argmax_token": 2164226,
+      "edge_flags": 1,
+      "toa_seconds": 74.4142466285226
+    },
+    {
+      "event_id": 1,
+      "representative_candidate_id": 1,
+      "grouping_window_id": 36,
+      "grouping_timed_out": false,
+      "source_chunk_index": 36,
+      "member_count": 2,
+      "beam_id": 0,
+      "primary_tree_index": 0,
+      "tree": 0,
+      "idm": 4095,
+      "itime": 50,
+      "snr": 98.625,
+      "dm": 1478.4927133633348,
+      "toa_sample_abs": 74524.49998474098,
+      "width_samp": 12.0,
+      "width_ms": 11.980799999999999,
+      "freq_lo_MHz": 300.0,
+      "freq_hi_MHz": 1500.0,
+      "argmax_token": 5769472,
+      "edge_flags": 2,
+      "toa_seconds": 74.40526078476539
+    }
+  ],
+  "members": [
+    {
+      "candidate_id": 0,
+      "event_id": 0,
+      "grouping_window_id": 20,
+      "grouping_timed_out": false,
+      "source_chunk_index": 20,
+      "beam_id": 0,
+      "primary_tree_index": 1,
+      "tree": 1,
+      "idm": 0,
+      "itime": 25,
+      "snr": 70.125,
+      "dm": 1478.7634493004555,
+      "toa_sample_abs": 74533.50022888882,
+      "width_samp": 12.0,
+      "width_ms": 11.980799999999999,
+      "freq_lo_MHz": 416.0251471689218,
+      "freq_hi_MHz": 1500.0,
+      "dm_step": 1.4438846049274874,
+      "time_step_samples": 32.0,
+      "argmax_token": 2164226,
+      "edge_flags": 1,
+      "toa_seconds": 74.4142466285226
+    },
+    {
+      "candidate_id": 1,
+      "event_id": 1,
+      "grouping_window_id": 36,
+      "grouping_timed_out": false,
+      "source_chunk_index": 36,
+      "beam_id": 0,
+      "primary_tree_index": 0,
+      "tree": 0,
+      "idm": 4095,
+      "itime": 50,
+      "snr": 98.625,
+      "dm": 1478.4927133633348,
+      "toa_sample_abs": 74524.49998474098,
+      "width_samp": 12.0,
+      "width_ms": 11.980799999999999,
+      "freq_lo_MHz": 300.0,
+      "freq_hi_MHz": 1500.0,
+      "dm_step": 0.36097115123187185,
+      "time_step_samples": 16.0,
+      "argmax_token": 5769472,
+      "edge_flags": 2,
+      "toa_seconds": 74.40526078476539
+    },
+    {
+      "candidate_id": 2,
+      "event_id": 1,
+      "grouping_window_id": 36,
+      "grouping_timed_out": false,
+      "source_chunk_index": 36,
+      "beam_id": 0,
+      "primary_tree_index": 1,
+      "tree": 2,
+      "idm": 0,
+      "itime": 25,
+      "snr": 96.5625,
+      "dm": 1478.6506406517778,
+      "toa_sample_abs": 74528.50003814755,
+      "width_samp": 12.0,
+      "width_ms": 11.980799999999999,
+      "freq_lo_MHz": 300.0,
+      "freq_hi_MHz": 1500.0,
+      "dm_step": 0.7219423024637437,
+      "time_step_samples": 32.0,
+      "argmax_token": 5047810,
+      "edge_flags": 1,
+      "toa_seconds": 74.40925443808652
+    }
+  ],
+  "windows": [
+    {
+      "grouping_window_id": 0,
+      "beam_ids": [
+        0
+      ],
+      "owner_source_chunk_index": 0,
+      "timed_out": false,
+      "output_status": "complete"
+    },
+    {
+      "grouping_window_id": 1,
+      "beam_ids": [
+        0
+      ],
+      "owner_source_chunk_index": 1,
+      "timed_out": false,
+      "output_status": "complete"
+    },
+    {
+      "grouping_window_id": 2,
+      "beam_ids": [
+        0
+      ],
+      "owner_source_chunk_index": 2,
+      "timed_out": false,
+      "output_status": "complete"
+    },
+    {
+      "grouping_window_id": 3,
+      "beam_ids": [
+        0
+      ],
+      "owner_source_chunk_index": 3,
+      "timed_out": false,
+      "output_status": "complete"
+    },
+    {
+      "grouping_window_id": 4,
+      "beam_ids": [
+        0
+      ],
+      "owner_source_chunk_index": 4,
+      "timed_out": false,
+      "output_status": "complete"
+    },
+    {
+      "grouping_window_id": 5,
+      "beam_ids": [
+        0
+      ],
+      "owner_source_chunk_index": 5,
+      "timed_out": false,
+      "output_status": "complete"
+    },
+    {
+      "grouping_window_id": 6,
+      "beam_ids": [
+        0
+      ],
+      "owner_source_chunk_index": 6,
+      "timed_out": false,
+      "output_status": "complete"
+    },
+    {
+      "grouping_window_id": 7,
+      "beam_ids": [
+        0
+      ],
+      "owner_source_chunk_index": 7,
+      "timed_out": false,
+      "output_status": "complete"
+    },
+    {
+      "grouping_window_id": 8,
+      "beam_ids": [
+        0
+      ],
+      "owner_source_chunk_index": 8,
+      "timed_out": false,
+      "output_status": "complete"
+    },
+    {
+      "grouping_window_id": 9,
+      "beam_ids": [
+        0
+      ],
+      "owner_source_chunk_index": 9,
+      "timed_out": false,
+      "output_status": "complete"
+    },
+    {
+      "grouping_window_id": 10,
+      "beam_ids": [
+        0
+      ],
+      "owner_source_chunk_index": 10,
+      "timed_out": false,
+      "output_status": "complete"
+    },
+    {
+      "grouping_window_id": 11,
+      "beam_ids": [
+        0
+      ],
+      "owner_source_chunk_index": 11,
+      "timed_out": false,
+      "output_status": "complete"
+    },
+    {
+      "grouping_window_id": 12,
+      "beam_ids": [
+        0
+      ],
+      "owner_source_chunk_index": 12,
+      "timed_out": false,
+      "output_status": "complete"
+    },
+    {
+      "grouping_window_id": 13,
+      "beam_ids": [
+        0
+      ],
+      "owner_source_chunk_index": 13,
+      "timed_out": false,
+      "output_status": "complete"
+    },
+    {
+      "grouping_window_id": 14,
+      "beam_ids": [
+        0
+      ],
+      "owner_source_chunk_index": 14,
+      "timed_out": false,
+      "output_status": "complete"
+    },
+    {
+      "grouping_window_id": 15,
+      "beam_ids": [
+        0
+      ],
+      "owner_source_chunk_index": 15,
+      "timed_out": false,
+      "output_status": "complete"
+    },
+    {
+      "grouping_window_id": 16,
+      "beam_ids": [
+        0
+      ],
+      "owner_source_chunk_index": 16,
+      "timed_out": false,
+      "output_status": "complete"
+    },
+    {
+      "grouping_window_id": 17,
+      "beam_ids": [
+        0
+      ],
+      "owner_source_chunk_index": 17,
+      "timed_out": false,
+      "output_status": "complete"
+    },
+    {
+      "grouping_window_id": 18,
+      "beam_ids": [
+        0
+      ],
+      "owner_source_chunk_index": 18,
+      "timed_out": false,
+      "output_status": "complete"
+    },
+    {
+      "grouping_window_id": 19,
+      "beam_ids": [
+        0
+      ],
+      "owner_source_chunk_index": 19,
+      "timed_out": false,
+      "output_status": "complete"
+    },
+    {
+      "grouping_window_id": 20,
+      "beam_ids": [
+        0
+      ],
+      "owner_source_chunk_index": 20,
+      "timed_out": false,
+      "output_status": "complete"
+    },
+    {
+      "grouping_window_id": 21,
+      "beam_ids": [
+        0
+      ],
+      "owner_source_chunk_index": 21,
+      "timed_out": false,
+      "output_status": "complete"
+    },
+    {
+      "grouping_window_id": 22,
+      "beam_ids": [
+        0
+      ],
+      "owner_source_chunk_index": 22,
+      "timed_out": false,
+      "output_status": "complete"
+    },
+    {
+      "grouping_window_id": 23,
+      "beam_ids": [
+        0
+      ],
+      "owner_source_chunk_index": 23,
+      "timed_out": false,
+      "output_status": "complete"
+    },
+    {
+      "grouping_window_id": 24,
+      "beam_ids": [
+        0
+      ],
+      "owner_source_chunk_index": 24,
+      "timed_out": false,
+      "output_status": "complete"
+    },
+    {
+      "grouping_window_id": 25,
+      "beam_ids": [
+        0
+      ],
+      "owner_source_chunk_index": 25,
+      "timed_out": false,
+      "output_status": "complete"
+    },
+    {
+      "grouping_window_id": 26,
+      "beam_ids": [
+        0
+      ],
+      "owner_source_chunk_index": 26,
+      "timed_out": false,
+      "output_status": "complete"
+    },
+    {
+      "grouping_window_id": 27,
+      "beam_ids": [
+        0
+      ],
+      "owner_source_chunk_index": 27,
+      "timed_out": false,
+      "output_status": "complete"
+    },
+    {
+      "grouping_window_id": 28,
+      "beam_ids": [
+        0
+      ],
+      "owner_source_chunk_index": 28,
+      "timed_out": false,
+      "output_status": "complete"
+    },
+    {
+      "grouping_window_id": 29,
+      "beam_ids": [
+        0
+      ],
+      "owner_source_chunk_index": 29,
+      "timed_out": false,
+      "output_status": "complete"
+    },
+    {
+      "grouping_window_id": 30,
+      "beam_ids": [
+        0
+      ],
+      "owner_source_chunk_index": 30,
+      "timed_out": false,
+      "output_status": "complete"
+    },
+    {
+      "grouping_window_id": 31,
+      "beam_ids": [
+        0
+      ],
+      "owner_source_chunk_index": 31,
+      "timed_out": false,
+      "output_status": "complete"
+    },
+    {
+      "grouping_window_id": 32,
+      "beam_ids": [
+        0
+      ],
+      "owner_source_chunk_index": 32,
+      "timed_out": false,
+      "output_status": "complete"
+    },
+    {
+      "grouping_window_id": 33,
+      "beam_ids": [
+        0
+      ],
+      "owner_source_chunk_index": 33,
+      "timed_out": false,
+      "output_status": "complete"
+    },
+    {
+      "grouping_window_id": 34,
+      "beam_ids": [
+        0
+      ],
+      "owner_source_chunk_index": 34,
+      "timed_out": false,
+      "output_status": "complete"
+    },
+    {
+      "grouping_window_id": 35,
+      "beam_ids": [
+        0
+      ],
+      "owner_source_chunk_index": 35,
+      "timed_out": false,
+      "output_status": "complete"
+    },
+    {
+      "grouping_window_id": 36,
+      "beam_ids": [
+        0
+      ],
+      "owner_source_chunk_index": 36,
+      "timed_out": false,
+      "output_status": "complete"
+    },
+    {
+      "grouping_window_id": 37,
+      "beam_ids": [
+        0
+      ],
+      "owner_source_chunk_index": 37,
+      "timed_out": false,
+      "output_status": "complete"
+    },
+    {
+      "grouping_window_id": 38,
+      "beam_ids": [
+        0
+      ],
+      "owner_source_chunk_index": 38,
+      "timed_out": false,
+      "output_status": "complete"
+    },
+    {
+      "grouping_window_id": 39,
+      "beam_ids": [
+        0
+      ],
+      "owner_source_chunk_index": 39,
+      "timed_out": false,
+      "output_status": "complete"
+    },
+    {
+      "grouping_window_id": 40,
+      "beam_ids": [
+        0
+      ],
+      "owner_source_chunk_index": 40,
+      "timed_out": false,
+      "output_status": "complete"
+    }
+  ]
+}

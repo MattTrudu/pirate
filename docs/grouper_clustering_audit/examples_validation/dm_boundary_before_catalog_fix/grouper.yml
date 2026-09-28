@@ -1,0 +1,12 @@
+execution:
+  beam_batch_size: 1
+  timeout_ms: 0
+  timeout_policy: discard
+grouping:
+  dm_tolerance: 1.5
+  halo_size: 2
+  time_tolerance: 1.5
+peakfinding:
+  dm_reach: 8
+  snr_threshold: 10.0
+  waist_bins: 1

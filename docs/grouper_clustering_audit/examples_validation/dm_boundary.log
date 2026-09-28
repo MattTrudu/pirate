@@ -1,0 +1,13 @@
+Effective cadence: 0.9984 ms
+Full-band tree 0 (primary 0): DM 0.000000000 to 1478.537835446
+Full-band tree 2 (primary 1): DM 1478.537835446 to 2957.075670891
+Injected DM: 1478.537835445747 pc cm^-3; one burst, 41 native chunks.
+Processed chunk 1/41
+
+3 native peak candidates -> 2 events.
+Event 1: 2 members from both sides of the primary DM boundary:
+  tree=0 primary=0 idm=4095 DM=1478.492713363 S/N=98.6250 TOA=74.405260785 s
+  tree=2 primary=1 idm=0 DM=1478.650640652 S/N=96.5625 TOA=74.409254438 s
+Separate early-trigger events: 1; early delivery verified: True.
+Checks: {'boundary_association_exercised': True, 'all_candidates_emitted_once': True, 'no_timeouts': True, 'native_decode_parity': True, 'representative_fields_preserved': True, 'early_report_emitted_before_boundary_event': True}
+Results: /home/mtrudu/src/pirate-1.5-integration/docs/grouper_clustering_audit/examples_validation/dm_boundary

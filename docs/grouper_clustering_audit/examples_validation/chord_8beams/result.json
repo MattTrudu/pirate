@@ -1,0 +1,176 @@
+{
+  "started_utc": "2026-09-28T00:31:13.618904+00:00",
+  "physical_cuda_device": 1,
+  "base_port": 21800,
+  "recipe": "examples/chord_8beams/observation.yml",
+  "recipe_unchanged": true,
+  "processing_complete": true,
+  "sender_complete": true,
+  "commands": {
+    "grouper": [
+      "/home/mtrudu/software/miniforge3/envs/pirate-15-validation/bin/python",
+      "-B",
+      "-m",
+      "pirate_frb",
+      "live",
+      "grouper",
+      "examples/chord_8beams/observation.yml",
+      "--base-port",
+      "21800"
+    ],
+    "dedisperser": [
+      "/home/mtrudu/software/miniforge3/envs/pirate-15-validation/bin/python",
+      "-B",
+      "-m",
+      "pirate_frb",
+      "live",
+      "dedisperser",
+      "examples/chord_8beams/observation.yml",
+      "--base-port",
+      "21800",
+      "--gpu",
+      "0"
+    ],
+    "event_monitor": [
+      "/home/mtrudu/software/miniforge3/envs/pirate-15-validation/bin/python",
+      "-B",
+      "-m",
+      "pirate_frb",
+      "live",
+      "event_monitor",
+      "examples/chord_8beams/observation.yml",
+      "--base-port",
+      "21800"
+    ],
+    "observation": [
+      "/home/mtrudu/software/miniforge3/envs/pirate-15-validation/bin/python",
+      "-B",
+      "-m",
+      "pirate_frb",
+      "live",
+      "observation",
+      "examples/chord_8beams/observation.yml",
+      "--base-port",
+      "21800"
+    ]
+  },
+  "exit_codes": {
+    "grouper": 0,
+    "dedisperser": 0,
+    "event_monitor": 0,
+    "observation": 0
+  },
+  "shutdown": {
+    "dedisperser": "SIGINT",
+    "event_monitor": "SIGINT"
+  },
+  "duration_seconds": 248.768,
+  "detection_count": 4,
+  "detections": [
+    "[event_monitor] beam=5 tree=0 DM=550.1536 S/N=41.656 sub-band=474.342-750.000 MHz TOA=50.004982 s (at 300 MHz, from observation start)",
+    "[event_monitor] beam=1 tree=0 DM=99.9905 S/N=47.156 sub-band=300.000-1500.000 MHz TOA=89.999805 s (at 300 MHz, from observation start)",
+    "[event_monitor] beam=8 tree=1 DM=2000.0217 S/N=35.219 sub-band=416.025-1500.000 MHz TOA=200.001516 s (at 300 MHz, from observation start)",
+    "[event_monitor] beam=8 tree=2 DM=1999.9912 S/N=50.344 sub-band=300.000-1500.000 MHz TOA=200.000164 s (at 300 MHz, from observation start)"
+  ],
+  "parsed_detections": [
+    {
+      "beam": 5,
+      "tree": 0,
+      "dm": 550.1536,
+      "snr": 41.656,
+      "toa": 50.004982
+    },
+    {
+      "beam": 1,
+      "tree": 0,
+      "dm": 99.9905,
+      "snr": 47.156,
+      "toa": 89.999805
+    },
+    {
+      "beam": 8,
+      "tree": 1,
+      "dm": 2000.0217,
+      "snr": 35.219,
+      "toa": 200.001516
+    },
+    {
+      "beam": 8,
+      "tree": 2,
+      "dm": 1999.9912,
+      "snr": 50.344,
+      "toa": 200.000164
+    }
+  ],
+  "truth_matches": {
+    "narrow_band": [
+      {
+        "beam": 5,
+        "tree": 0,
+        "dm": 550.1536,
+        "snr": 41.656,
+        "toa": 50.004982
+      }
+    ],
+    "low_dm": [
+      {
+        "beam": 1,
+        "tree": 0,
+        "dm": 99.9905,
+        "snr": 47.156,
+        "toa": 89.999805
+      }
+    ],
+    "high_dm": [
+      {
+        "beam": 8,
+        "tree": 1,
+        "dm": 2000.0217,
+        "snr": 35.219,
+        "toa": 200.001516
+      },
+      {
+        "beam": 8,
+        "tree": 2,
+        "dm": 1999.9912,
+        "snr": 50.344,
+        "toa": 200.000164
+      }
+    ]
+  },
+  "truth_match_criteria": {
+    "same_beam": true,
+    "abs_dm_less_than": 5,
+    "abs_toa_seconds_less_than": 0.1
+  },
+  "expected_report_pattern_found": true,
+  "diagnostics": {
+    "grouper": [
+      "[grouper] Processing complete: 4 detection(s). Stop dedisperser first, then event_monitor."
+    ],
+    "dedisperser": [],
+    "event_monitor": [
+      "[event_monitor] Printed 4 detection(s)."
+    ],
+    "observation": [
+      "[observation] Sending complete. Wait for the grouper's processing-complete message."
+    ]
+  },
+  "success": true,
+  "environment": {
+    "CUDA_VISIBLE_DEVICES": "1",
+    "PYTHONUNBUFFERED": "1",
+    "CUPY_CACHE_DIR": "/tmp/pirate-examples-20260928/eight-cupy-cache",
+    "CUDA_CACHE_PATH": "/tmp/pirate-examples-20260928/eight-cuda-cache"
+  },
+  "hardware": "NVIDIA A40",
+  "science_chunks": 108,
+  "effective_duration_seconds": 220.8301056,
+  "input_recipe_sha256": "57cd2ab91c58a81e30d4f5033c94a972357f64f7b2802f8ae3a8c7c37517d9f5",
+  "error_drop_timeout_lines": {
+    "grouper": [],
+    "dedisperser": [],
+    "event_monitor": [],
+    "observation": []
+  }
+}

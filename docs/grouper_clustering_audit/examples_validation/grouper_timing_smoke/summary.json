@@ -1,0 +1,33 @@
+{
+  "argv": [
+    "/home/mtrudu/software/miniforge3/envs/pirate-15-validation/bin/python",
+    "-B",
+    "examples/grouper_timing/benchmark.py",
+    "--gpu",
+    "0",
+    "--counts",
+    "64",
+    "128",
+    "--seeds",
+    "1",
+    "--repeats",
+    "1",
+    "--warmup",
+    "1",
+    "--output-dir",
+    "/home/mtrudu/src/pirate-1.5-integration/docs/grouper_clustering_audit/examples_validation/grouper_timing_smoke"
+  ],
+  "cuda_visible_devices": "0",
+  "exit_code": 0,
+  "elapsed_seconds": 20.872202262980863,
+  "status": "passed",
+  "purpose": "Bounded execution smoke only, not publishable performance measurements.",
+  "case_count": 20,
+  "measurement_count": 20,
+  "all_complete": true,
+  "all_members_preserved": true,
+  "figure7_assignments_equal": true,
+  "partition_keys": [
+    "beam_id"
+  ]
+}

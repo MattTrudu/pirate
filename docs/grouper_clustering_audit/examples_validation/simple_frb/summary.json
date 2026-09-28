@@ -1,0 +1,660 @@
+{
+  "example": "simple_frb",
+  "started_utc": "2026-09-28T00:32:23.677671+00:00",
+  "output": "/tmp/pirate-examples-20260928/simple-offline",
+  "report": "/home/mtrudu/src/pirate-1.5-integration/docs/grouper_clustering_audit/examples_validation/simple_frb",
+  "python": "/home/mtrudu/software/miniforge3/envs/pirate-15-validation/bin/python",
+  "cuda_visible_devices": "0",
+  "base_port": 21700,
+  "recipe_sha256": "d510388901b815cb1b6dc8c13c785ab8123ff73aaccb46b4fde953f8d8d70b69",
+  "commands": [
+    {
+      "role": "offline-generate",
+      "argv": [
+        "/home/mtrudu/software/miniforge3/envs/pirate-15-validation/bin/python",
+        "-B",
+        "-m",
+        "examples.simple_frb.generate",
+        "/tmp/pirate-examples-20260928/simple-offline"
+      ],
+      "shell": "/home/mtrudu/software/miniforge3/envs/pirate-15-validation/bin/python -B -m examples.simple_frb.generate /tmp/pirate-examples-20260928/simple-offline",
+      "pid": 226796,
+      "log": "/home/mtrudu/src/pirate-1.5-integration/docs/grouper_clustering_audit/examples_validation/simple_frb/offline-generate.log",
+      "exit_code": 0,
+      "elapsed_seconds": 5.682606080954429
+    },
+    {
+      "role": "offline-dedisperser",
+      "argv": [
+        "/home/mtrudu/software/miniforge3/envs/pirate-15-validation/bin/python",
+        "-B",
+        "-m",
+        "pirate_frb",
+        "run",
+        "offline_dedisperser",
+        "/tmp/pirate-examples-20260928/simple-offline/frames",
+        "/tmp/pirate-examples-20260928/simple-offline/dedispersion.yml",
+        "--save"
+      ],
+      "shell": "/home/mtrudu/software/miniforge3/envs/pirate-15-validation/bin/python -B -m pirate_frb run offline_dedisperser /tmp/pirate-examples-20260928/simple-offline/frames /tmp/pirate-examples-20260928/simple-offline/dedispersion.yml --save",
+      "pid": 226880,
+      "log": "/home/mtrudu/src/pirate-1.5-integration/docs/grouper_clustering_audit/examples_validation/simple_frb/offline-dedisperser.log",
+      "exit_code": 0,
+      "elapsed_seconds": 4.228390987031162
+    },
+    {
+      "role": "offline-grouper",
+      "argv": [
+        "/home/mtrudu/software/miniforge3/envs/pirate-15-validation/bin/python",
+        "-B",
+        "-m",
+        "pirate_frb",
+        "run",
+        "offline_grouper",
+        "/tmp/pirate-examples-20260928/simple-offline/frames",
+        "/tmp/pirate-examples-20260928/simple-offline/grouper.yml",
+        "--output",
+        "/tmp/pirate-examples-20260928/simple-offline/events.asdf"
+      ],
+      "shell": "/home/mtrudu/software/miniforge3/envs/pirate-15-validation/bin/python -B -m pirate_frb run offline_grouper /tmp/pirate-examples-20260928/simple-offline/frames /tmp/pirate-examples-20260928/simple-offline/grouper.yml --output /tmp/pirate-examples-20260928/simple-offline/events.asdf",
+      "pid": 226976,
+      "log": "/home/mtrudu/src/pirate-1.5-integration/docs/grouper_clustering_audit/examples_validation/simple_frb/offline-grouper.log",
+      "exit_code": 0,
+      "elapsed_seconds": 28.691948760009836
+    },
+    {
+      "role": "live-grouper",
+      "argv": [
+        "/home/mtrudu/software/miniforge3/envs/pirate-15-validation/bin/python",
+        "-B",
+        "-m",
+        "pirate_frb",
+        "live",
+        "grouper",
+        "examples/simple_frb/observation.yml",
+        "--base-port",
+        "21700"
+      ],
+      "shell": "/home/mtrudu/software/miniforge3/envs/pirate-15-validation/bin/python -B -m pirate_frb live grouper examples/simple_frb/observation.yml --base-port 21700",
+      "pid": 227217,
+      "log": "/home/mtrudu/src/pirate-1.5-integration/docs/grouper_clustering_audit/examples_validation/simple_frb/live-grouper.log",
+      "exit_code": 0,
+      "elapsed_seconds": 75.20878317102324
+    },
+    {
+      "role": "live-dedisperser",
+      "argv": [
+        "/home/mtrudu/software/miniforge3/envs/pirate-15-validation/bin/python",
+        "-B",
+        "-m",
+        "pirate_frb",
+        "live",
+        "dedisperser",
+        "examples/simple_frb/observation.yml",
+        "--base-port",
+        "21700"
+      ],
+      "shell": "/home/mtrudu/software/miniforge3/envs/pirate-15-validation/bin/python -B -m pirate_frb live dedisperser examples/simple_frb/observation.yml --base-port 21700",
+      "pid": 227218,
+      "log": "/home/mtrudu/src/pirate-1.5-integration/docs/grouper_clustering_audit/examples_validation/simple_frb/live-dedisperser.log",
+      "stop_signal": "SIGINT",
+      "exit_code": 0,
+      "elapsed_seconds": 75.2016953920247
+    },
+    {
+      "role": "live-event_monitor",
+      "argv": [
+        "/home/mtrudu/software/miniforge3/envs/pirate-15-validation/bin/python",
+        "-B",
+        "-m",
+        "pirate_frb",
+        "live",
+        "event_monitor",
+        "examples/simple_frb/observation.yml",
+        "--base-port",
+        "21700"
+      ],
+      "shell": "/home/mtrudu/software/miniforge3/envs/pirate-15-validation/bin/python -B -m pirate_frb live event_monitor examples/simple_frb/observation.yml --base-port 21700",
+      "pid": 227219,
+      "log": "/home/mtrudu/src/pirate-1.5-integration/docs/grouper_clustering_audit/examples_validation/simple_frb/live-event_monitor.log",
+      "stop_signal": "SIGINT",
+      "exit_code": 0,
+      "elapsed_seconds": 75.3191494520288
+    },
+    {
+      "role": "live-observation",
+      "argv": [
+        "/home/mtrudu/software/miniforge3/envs/pirate-15-validation/bin/python",
+        "-B",
+        "-m",
+        "pirate_frb",
+        "live",
+        "observation",
+        "examples/simple_frb/observation.yml",
+        "--base-port",
+        "21700"
+      ],
+      "shell": "/home/mtrudu/software/miniforge3/envs/pirate-15-validation/bin/python -B -m pirate_frb live observation examples/simple_frb/observation.yml --base-port 21700",
+      "pid": 227554,
+      "log": "/home/mtrudu/src/pirate-1.5-integration/docs/grouper_clustering_audit/examples_validation/simple_frb/live-observation.log",
+      "exit_code": 0,
+      "elapsed_seconds": 72.41570068500005
+    }
+  ],
+  "status": "passed",
+  "offline": {
+    "events": [
+      {
+        "argmax_token": 131841,
+        "beam_id": 1,
+        "dm": 499.99779521093535,
+        "edge_flags": 0,
+        "event_id": 0,
+        "freq_hi_MHz": 1500.0,
+        "freq_lo_MHz": 300.0,
+        "grouping_timed_out": false,
+        "grouping_window_id": 19,
+        "idm": 1385,
+        "itime": 72,
+        "member_count": 1,
+        "primary_tree_index": 0,
+        "representative_candidate_id": 0,
+        "snr": 46.0625,
+        "source_chunk_index": 19,
+        "toa_sample_abs": 40064.169085221634,
+        "tree": 0,
+        "width_ms": 2.9951999999999996,
+        "width_samp": 3.0
+      }
+    ],
+    "members": [
+      {
+        "argmax_token": 131841,
+        "beam_id": 1,
+        "candidate_id": 0,
+        "dm": 499.99779521093535,
+        "dm_step": 0.36097115123187185,
+        "edge_flags": 0,
+        "event_id": 0,
+        "freq_hi_MHz": 1500.0,
+        "freq_lo_MHz": 300.0,
+        "grouping_timed_out": false,
+        "grouping_window_id": 19,
+        "idm": 1385,
+        "itime": 72,
+        "primary_tree_index": 0,
+        "snr": 46.0625,
+        "source_chunk_index": 19,
+        "time_step_samples": 16.0,
+        "toa_sample_abs": 40064.169085221634,
+        "tree": 0,
+        "width_ms": 2.9951999999999996,
+        "width_samp": 3.0
+      }
+    ],
+    "coverage": [
+      {
+        "beam_id": 1,
+        "source_chunk_index": 0
+      },
+      {
+        "beam_id": 1,
+        "source_chunk_index": 1
+      },
+      {
+        "beam_id": 1,
+        "source_chunk_index": 2
+      },
+      {
+        "beam_id": 1,
+        "source_chunk_index": 3
+      },
+      {
+        "beam_id": 1,
+        "source_chunk_index": 4
+      },
+      {
+        "beam_id": 1,
+        "source_chunk_index": 5
+      },
+      {
+        "beam_id": 1,
+        "source_chunk_index": 6
+      },
+      {
+        "beam_id": 1,
+        "source_chunk_index": 7
+      },
+      {
+        "beam_id": 1,
+        "source_chunk_index": 8
+      },
+      {
+        "beam_id": 1,
+        "source_chunk_index": 9
+      },
+      {
+        "beam_id": 1,
+        "source_chunk_index": 10
+      },
+      {
+        "beam_id": 1,
+        "source_chunk_index": 11
+      },
+      {
+        "beam_id": 1,
+        "source_chunk_index": 12
+      },
+      {
+        "beam_id": 1,
+        "source_chunk_index": 13
+      },
+      {
+        "beam_id": 1,
+        "source_chunk_index": 14
+      },
+      {
+        "beam_id": 1,
+        "source_chunk_index": 15
+      },
+      {
+        "beam_id": 1,
+        "source_chunk_index": 16
+      },
+      {
+        "beam_id": 1,
+        "source_chunk_index": 17
+      },
+      {
+        "beam_id": 1,
+        "source_chunk_index": 18
+      },
+      {
+        "beam_id": 1,
+        "source_chunk_index": 19
+      },
+      {
+        "beam_id": 1,
+        "source_chunk_index": 20
+      },
+      {
+        "beam_id": 1,
+        "source_chunk_index": 21
+      },
+      {
+        "beam_id": 1,
+        "source_chunk_index": 22
+      },
+      {
+        "beam_id": 1,
+        "source_chunk_index": 23
+      },
+      {
+        "beam_id": 1,
+        "source_chunk_index": 24
+      },
+      {
+        "beam_id": 1,
+        "source_chunk_index": 25
+      },
+      {
+        "beam_id": 1,
+        "source_chunk_index": 26
+      },
+      {
+        "beam_id": 1,
+        "source_chunk_index": 27
+      },
+      {
+        "beam_id": 1,
+        "source_chunk_index": 28
+      },
+      {
+        "beam_id": 1,
+        "source_chunk_index": 29
+      },
+      {
+        "beam_id": 1,
+        "source_chunk_index": 30
+      },
+      {
+        "beam_id": 1,
+        "source_chunk_index": 31
+      }
+    ],
+    "grouping_windows": [
+      {
+        "beam_ids": [
+          1
+        ],
+        "grouping_window_id": 0,
+        "output_status": "complete",
+        "owner_source_chunk_index": 0,
+        "timed_out": false
+      },
+      {
+        "beam_ids": [
+          1
+        ],
+        "grouping_window_id": 1,
+        "output_status": "complete",
+        "owner_source_chunk_index": 1,
+        "timed_out": false
+      },
+      {
+        "beam_ids": [
+          1
+        ],
+        "grouping_window_id": 2,
+        "output_status": "complete",
+        "owner_source_chunk_index": 2,
+        "timed_out": false
+      },
+      {
+        "beam_ids": [
+          1
+        ],
+        "grouping_window_id": 3,
+        "output_status": "complete",
+        "owner_source_chunk_index": 3,
+        "timed_out": false
+      },
+      {
+        "beam_ids": [
+          1
+        ],
+        "grouping_window_id": 4,
+        "output_status": "complete",
+        "owner_source_chunk_index": 4,
+        "timed_out": false
+      },
+      {
+        "beam_ids": [
+          1
+        ],
+        "grouping_window_id": 5,
+        "output_status": "complete",
+        "owner_source_chunk_index": 5,
+        "timed_out": false
+      },
+      {
+        "beam_ids": [
+          1
+        ],
+        "grouping_window_id": 6,
+        "output_status": "complete",
+        "owner_source_chunk_index": 6,
+        "timed_out": false
+      },
+      {
+        "beam_ids": [
+          1
+        ],
+        "grouping_window_id": 7,
+        "output_status": "complete",
+        "owner_source_chunk_index": 7,
+        "timed_out": false
+      },
+      {
+        "beam_ids": [
+          1
+        ],
+        "grouping_window_id": 8,
+        "output_status": "complete",
+        "owner_source_chunk_index": 8,
+        "timed_out": false
+      },
+      {
+        "beam_ids": [
+          1
+        ],
+        "grouping_window_id": 9,
+        "output_status": "complete",
+        "owner_source_chunk_index": 9,
+        "timed_out": false
+      },
+      {
+        "beam_ids": [
+          1
+        ],
+        "grouping_window_id": 10,
+        "output_status": "complete",
+        "owner_source_chunk_index": 10,
+        "timed_out": false
+      },
+      {
+        "beam_ids": [
+          1
+        ],
+        "grouping_window_id": 11,
+        "output_status": "complete",
+        "owner_source_chunk_index": 11,
+        "timed_out": false
+      },
+      {
+        "beam_ids": [
+          1
+        ],
+        "grouping_window_id": 12,
+        "output_status": "complete",
+        "owner_source_chunk_index": 12,
+        "timed_out": false
+      },
+      {
+        "beam_ids": [
+          1
+        ],
+        "grouping_window_id": 13,
+        "output_status": "complete",
+        "owner_source_chunk_index": 13,
+        "timed_out": false
+      },
+      {
+        "beam_ids": [
+          1
+        ],
+        "grouping_window_id": 14,
+        "output_status": "complete",
+        "owner_source_chunk_index": 14,
+        "timed_out": false
+      },
+      {
+        "beam_ids": [
+          1
+        ],
+        "grouping_window_id": 15,
+        "output_status": "complete",
+        "owner_source_chunk_index": 15,
+        "timed_out": false
+      },
+      {
+        "beam_ids": [
+          1
+        ],
+        "grouping_window_id": 16,
+        "output_status": "complete",
+        "owner_source_chunk_index": 16,
+        "timed_out": false
+      },
+      {
+        "beam_ids": [
+          1
+        ],
+        "grouping_window_id": 17,
+        "output_status": "complete",
+        "owner_source_chunk_index": 17,
+        "timed_out": false
+      },
+      {
+        "beam_ids": [
+          1
+        ],
+        "grouping_window_id": 18,
+        "output_status": "complete",
+        "owner_source_chunk_index": 18,
+        "timed_out": false
+      },
+      {
+        "beam_ids": [
+          1
+        ],
+        "grouping_window_id": 19,
+        "output_status": "complete",
+        "owner_source_chunk_index": 19,
+        "timed_out": false
+      },
+      {
+        "beam_ids": [
+          1
+        ],
+        "grouping_window_id": 20,
+        "output_status": "complete",
+        "owner_source_chunk_index": 20,
+        "timed_out": false
+      },
+      {
+        "beam_ids": [
+          1
+        ],
+        "grouping_window_id": 21,
+        "output_status": "complete",
+        "owner_source_chunk_index": 21,
+        "timed_out": false
+      },
+      {
+        "beam_ids": [
+          1
+        ],
+        "grouping_window_id": 22,
+        "output_status": "complete",
+        "owner_source_chunk_index": 22,
+        "timed_out": false
+      },
+      {
+        "beam_ids": [
+          1
+        ],
+        "grouping_window_id": 23,
+        "output_status": "complete",
+        "owner_source_chunk_index": 23,
+        "timed_out": false
+      },
+      {
+        "beam_ids": [
+          1
+        ],
+        "grouping_window_id": 24,
+        "output_status": "complete",
+        "owner_source_chunk_index": 24,
+        "timed_out": false
+      },
+      {
+        "beam_ids": [
+          1
+        ],
+        "grouping_window_id": 25,
+        "output_status": "complete",
+        "owner_source_chunk_index": 25,
+        "timed_out": false
+      },
+      {
+        "beam_ids": [
+          1
+        ],
+        "grouping_window_id": 26,
+        "output_status": "complete",
+        "owner_source_chunk_index": 26,
+        "timed_out": false
+      },
+      {
+        "beam_ids": [
+          1
+        ],
+        "grouping_window_id": 27,
+        "output_status": "complete",
+        "owner_source_chunk_index": 27,
+        "timed_out": false
+      },
+      {
+        "beam_ids": [
+          1
+        ],
+        "grouping_window_id": 28,
+        "output_status": "complete",
+        "owner_source_chunk_index": 28,
+        "timed_out": false
+      },
+      {
+        "beam_ids": [
+          1
+        ],
+        "grouping_window_id": 29,
+        "output_status": "complete",
+        "owner_source_chunk_index": 29,
+        "timed_out": false
+      },
+      {
+        "beam_ids": [
+          1
+        ],
+        "grouping_window_id": 30,
+        "output_status": "complete",
+        "owner_source_chunk_index": 30,
+        "timed_out": false
+      },
+      {
+        "beam_ids": [
+          1
+        ],
+        "grouping_window_id": 31,
+        "output_status": "complete",
+        "owner_source_chunk_index": 31,
+        "timed_out": false
+      }
+    ],
+    "map_count": 32,
+    "coverage_rows": 32
+  },
+  "live_processing_complete": true,
+  "online": {
+    "detections": [
+      {
+        "beam": "1",
+        "tree": "0",
+        "dm": "499.9978",
+        "snr": "46.062",
+        "freq_lo": "300.000",
+        "freq_hi": "1500.000",
+        "toa_seconds": "40.000067"
+      }
+    ]
+  },
+  "online_matches_offline_at_monitor_precision": true,
+  "expected_monitor_rows": [
+    [
+      "1",
+      "0",
+      "499.9978",
+      "46.062",
+      "300.000",
+      "1500.000",
+      "40.000067"
+    ]
+  ],
+  "error_lines": [],
+  "completed_utc": "2026-09-28T00:34:18.449644+00:00",
+  "transport_timestamp_quantization": [
+    {
+      "fpga_timestamp": 7812513,
+      "tick_seconds": 5.12e-06,
+      "offline_toa_seconds": 40.00006641468528,
+      "transport_toa_seconds": 40.00006656,
+      "difference_seconds": 1.4531472203316298e-07
+    }
+  ],
+  "comparison_note": "Compare monitor TOA after documented rounding to an integer FPGA sequence tick; raw catalog TOA retains sub-tick precision. Initial validator compared raw TOA formatting and was corrected without rerunning production commands.",
+  "packet_drop_counter": "The public live CLI does not print a packet-drop counter; no drop/error warning appeared, all 32 science chunks were processed, and one detection was received.",
+  "all_commands_exit_zero": true,
+  "no_grouping_timeouts": true,
+  "clustering_sha256": "db200ae4cd205fae521d1d100b527f56e0a341ff0f87bfc0ec29f11e21500b71"
+}

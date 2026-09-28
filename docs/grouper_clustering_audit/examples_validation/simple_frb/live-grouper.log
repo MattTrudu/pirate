@@ -1,0 +1,11 @@
+[grouper] 1 beams, 65.431 s; no output files.
+[grouper] Waiting for dedisperser and observation.
+FrbGrouper: waiting for FrbServer to connect at 127.0.0.1:21702 ...
+FrbGrouper: client connected at 127.0.0.1:21702
+FrbGrouper: handshake processed (cuda_device_id=0, ntrees=1, total_beams=1, nbatches=1)
+FrbGrouper: pinning thread to vcpu_list=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47] and selecting cuda_device_id=0
+[grouper] Processed 8/32 chunks.
+[grouper] Processed 16/32 chunks.
+[grouper] Processed 24/32 chunks.
+[grouper] Processed 32/32 chunks.
+[grouper] Processing complete: 1 detection(s). Stop dedisperser first, then event_monitor.

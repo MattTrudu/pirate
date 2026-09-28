@@ -1,0 +1,55 @@
+[
+  {
+    "name": "prepare_only",
+    "command": [
+      "/home/mtrudu/software/miniforge3/envs/pirate-15-validation/bin/python",
+      "-B",
+      "-m",
+      "examples.dm_boundary.run",
+      "--prepare-only",
+      "--output",
+      "/tmp/pirate-boundary-cli-check-kb6xrlrw/good"
+    ],
+    "exit_code": 0,
+    "expected_exit": 0,
+    "passed": true,
+    "stdout": "Effective cadence: 0.9984 ms\nFull-band tree 0 (primary 0): DM 0.000000000 to 1478.537835446\nFull-band tree 2 (primary 1): DM 1478.537835446 to 2957.075670891\nInjected DM: 1478.537835445747 pc cm^-3; one burst, 41 native chunks.\nCPU preparation passed. Resolved files: /tmp/pirate-boundary-cli-check-kb6xrlrw/good\n",
+    "stderr": ""
+  },
+  {
+    "name": "existing_output_rejected",
+    "command": [
+      "/home/mtrudu/software/miniforge3/envs/pirate-15-validation/bin/python",
+      "-B",
+      "-m",
+      "examples.dm_boundary.run",
+      "--prepare-only",
+      "--output",
+      "/tmp/pirate-boundary-cli-check-kb6xrlrw/good"
+    ],
+    "exit_code": 1,
+    "expected_exit": 1,
+    "passed": true,
+    "stdout": "",
+    "stderr": "Traceback (most recent call last):\n  File \"<frozen runpy>\", line 198, in _run_module_as_main\n  File \"<frozen runpy>\", line 88, in _run_code\n  File \"/home/mtrudu/src/pirate-1.5-integration/examples/dm_boundary/run.py\", line 268, in <module>\n    main()\n  File \"/home/mtrudu/src/pirate-1.5-integration/examples/dm_boundary/run.py\", line 256, in main\n    output.mkdir(parents=True, exist_ok=False)\n  File \"/home/mtrudu/software/miniforge3/envs/pirate-15-validation/lib/python3.11/pathlib.py\", line 1116, in mkdir\n    os.mkdir(self, mode)\nFileExistsError: [Errno 17] File exists: '/tmp/pirate-boundary-cli-check-kb6xrlrw/good'\n"
+  },
+  {
+    "name": "stale_dm_rejected",
+    "command": [
+      "/home/mtrudu/software/miniforge3/envs/pirate-15-validation/bin/python",
+      "-B",
+      "-m",
+      "examples.dm_boundary.run",
+      "--prepare-only",
+      "--recipe",
+      "/tmp/pirate-boundary-cli-check-kb6xrlrw/wrong_dm.yml",
+      "--output",
+      "/tmp/pirate-boundary-cli-check-kb6xrlrw/wrong"
+    ],
+    "exit_code": 1,
+    "expected_exit": 1,
+    "passed": true,
+    "stdout": "",
+    "stderr": "Traceback (most recent call last):\n  File \"<frozen runpy>\", line 198, in _run_module_as_main\n  File \"<frozen runpy>\", line 88, in _run_code\n  File \"/home/mtrudu/src/pirate-1.5-integration/examples/dm_boundary/run.py\", line 268, in <module>\n    main()\n  File \"/home/mtrudu/src/pirate-1.5-integration/examples/dm_boundary/run.py\", line 260, in main\n    recipe, bundle, manifest = prepare(args.recipe, output)\n                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/mtrudu/src/pirate-1.5-integration/examples/dm_boundary/run.py\", line 54, in prepare\n    raise ValueError(f\"recipe DM={truth['dm']:.12f}, but the resolved boundary is \"\nValueError: recipe DM=500.000000000000, but the resolved boundary is 1478.537835445747; update the recipe after changing the search plan\n"
+  }
+]

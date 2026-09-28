@@ -1,0 +1,27 @@
+Effective cadence: 0.9984 ms
+Full-band tree 0 (primary 0): DM 0.000000000 to 1478.537835446
+Full-band tree 2 (primary 1): DM 1478.537835446 to 2957.075670891
+Injected DM: 1478.537835445747 pc cm^-3; one burst, 41 native chunks.
+Processed chunk 1/41
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/mtrudu/src/pirate-1.5-integration/examples/dm_boundary/run.py", line 268, in <module>
+    main()
+  File "/home/mtrudu/src/pirate-1.5-integration/examples/dm_boundary/run.py", line 264, in main
+    run(output, recipe, bundle, manifest, args.gpu)
+  File "/home/mtrudu/src/pirate-1.5-integration/examples/dm_boundary/run.py", line 161, in run
+    recorder.write(output / "events.asdf", [processor], complete=True)
+  File "/home/mtrudu/src/pirate-1.5-integration/pirate_frb/GrouperPipeline.py", line 520, in write
+    return write_trigger_catalog(path, self.batches, coverage=coverage, metadata=metadata)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mtrudu/src/pirate-1.5-integration/pirate_frb/TriggerCatalog.py", line 939, in write_trigger_catalog
+    tree = build_trigger_catalog_tree(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mtrudu/src/pirate-1.5-integration/pirate_frb/TriggerCatalog.py", line 869, in build_trigger_catalog_tree
+    validate_trigger_catalog_tree(tree)
+  File "/home/mtrudu/src/pirate-1.5-integration/pirate_frb/TriggerCatalog.py", line 901, in validate_trigger_catalog_tree
+    _validate_metadata(tree.get("metadata"), coverage, events, members)
+  File "/home/mtrudu/src/pirate-1.5-integration/pirate_frb/TriggerCatalog.py", line 815, in _validate_metadata
+    raise ValueError("event members cross a grouping domain or window")
+ValueError: event members cross a grouping domain or window

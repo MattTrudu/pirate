@@ -1,8 +1,10 @@
 """Synthetic scientific checks for representative-based GPU grouping."""
 
 import ast
-from dataclasses import fields
+from dataclasses import fields, replace
 import inspect
+import json
+from pathlib import Path
 import textwrap
 
 import numpy as np
@@ -13,6 +15,7 @@ from ..Clustering import (
     ClusteringGeometry,
     compatible_with_representative,
     cluster_candidates,
+    _cluster_candidates_serial_oracle,
 )
 from ..BowtiePeakfinding import EdgeFlag
 
@@ -88,7 +91,7 @@ def _candidates(cp, geometry, rows):
 
 
 def test_pair_compatibility_physical_boundaries(cuda_device_id=0):
-    """Beam, family, tree, DM, and residual-time conditions are all required."""
+    """Only beam and physical distances restrict tree-independent association."""
 
     import cupy as cp
 
@@ -112,12 +115,12 @@ def test_pair_compatibility_physical_boundaries(cuda_device_id=0):
         )
         assert np.array_equal(
             cp.asnumpy(match),
-            np.asarray([True, False, False, False, False, False]),
+            np.asarray([True, True, False, True, False, False]),
         )
 
 
-def test_greedy_grouping_tree_choice_and_isolation(cuda_device_id=0):
-    """The loudest compatible row per tree joins; all isolations remain exact."""
+def test_greedy_grouping_all_compatible_rows_and_beam_isolation(cuda_device_id=0):
+    """All compatible rows join across trees/families, while beams stay apart."""
 
     import cupy as cp
 
@@ -137,20 +140,21 @@ def test_greedy_grouping_tree_choice_and_isolation(cuda_device_id=0):
         ])
         grouped = cluster_candidates(candidates, geometry)
         event_id = cp.asnumpy(grouped.candidate_event_id)
-        assert event_id[0] == event_id[1] == event_id[3]
-        assert event_id[2] != event_id[0]
+        assert event_id[0] == event_id[1] == event_id[2] == event_id[3]
         assert event_id[4] != event_id[0]
-        assert event_id[5] != event_id[0]
+        assert event_id[5] == event_id[0]
         assert event_id[6] != event_id[0]
         first_members = cp.asnumpy(
             grouped.members.candidate_index[
                 grouped.members.event_id == event_id[0]
             ]
         )
-        assert set(first_members.tolist()) == {0, 1, 3}
-        member_trees = cp.asnumpy(candidates.tree[first_members])
-        assert len(set(member_trees.tolist())) == len(member_trees)
+        assert set(first_members.tolist()) == {0, 1, 2, 3, 5}
+        assert len(grouped.events) == 3
         assert int(cp.asnumpy(grouped.events.representative_candidate_index)[0]) == 0
+        _assert_grouping_tables_equal(
+            cp, grouped, _cluster_candidates_serial_oracle(candidates, geometry)
+        )
 
 
 def test_grouping_across_chunks_uses_absolute_toa(cuda_device_id=0):
@@ -297,16 +301,20 @@ def test_timeout_discards_in_progress_event_and_rebases_indices(
         geometry = _timeout_geometry(cp)
         # Event zero scans two 256-thread tiles and commits input rows 0/299.
         # The deterministic GPU hook expires on tile three, midway through the
-        # next same-tree representative event.
+        # next representative event. Middle rows are outside the seed's DM
+        # tolerance, rather than depending on the obsolete same-tree veto.
         rows = [
             {
                 "tree": 0,
                 "snr": 1000.0 - i,
-                "dm": 0.0,
+                "dm": float(10 * i),
                 "toa": 0.0,
             }
             for i in range(299)
         ] + [{"tree": 1, "snr": 1.0, "dm": 0.0, "toa": 0.0}]
+        # The canceled second group actually stages a compatible member before
+        # cancellation. Neither its seed nor that member may leak to output.
+        rows[2]["dm"] = rows[1]["dm"]
         candidates = _candidates(cp, geometry, rows)
         partial = cluster_candidates(
             candidates,
@@ -330,7 +338,7 @@ def test_timeout_discards_in_progress_event_and_rebases_indices(
         assert len(partial.candidates) == len(partial.members) == 2
         assert int(cp.sum(partial.events.member_count).item()) == 2
 
-        # The deterministic hook and integer winner selection produce the same
+        # The deterministic hook and seed ordering produce the same
         # clean partial tables on every execution.
         repeated = cluster_candidates(
             candidates,
@@ -454,3 +462,328 @@ def test_grouping_rejects_noncurrent_owning_device(cuda_device_id=0):
             assert "current CUDA device" in str(exc)
         else:
             raise AssertionError("cross-device grouping did not fail explicitly")
+
+
+def test_saved_native_trial_000317_merges_same_tree_plateau(cuda_device_id=0):
+    """Unmodified real singleton reports become two members of one event."""
+
+    import cupy as cp
+
+    from ..pirate_pybind11 import DedispersionConfig, DedispersionPlan
+
+    fixture = json.loads((
+        Path(__file__).parent / "data" / "clustering_trial_000317.json"
+    ).read_text())
+    config = DedispersionConfig.from_yaml_string(fixture["config_yaml"])
+    plan = DedispersionPlan.from_yaml_string(config, fixture["plan_yaml"])
+    tolerance = ClusteringTolerances(**fixture["tolerances"])
+    original = fixture["events"]
+    assert len(original) == 2
+    assert [event["member_count"] for event in original] == [1, 1]
+    assert [event["idm"] for event in original] == [1383, 1384]
+    assert original[0]["snr"] == original[1]["snr"] == 59.65625
+    assert float(plan.config.time_sample_ms) == 0.9984
+
+    with cp.cuda.Device(cuda_device_id):
+        geometry = ClusteringGeometry.from_plan(plan)
+        # Reverse input order as well: equal-S/N choice must follow provenance,
+        # not whichever row happens to arrive first in the test table.
+        for records in (original, list(reversed(original))):
+            rows = [dict(row, toa=row["toa_sample_abs"]) for row in records]
+            candidates = _candidates(cp, geometry, rows)
+            representative = next(
+                i for i, record in enumerate(records) if record["idm"] == 1383
+            )
+            other = 1 - representative
+            assert compatible_with_representative(
+                candidates, representative, cp.asarray([other]), geometry,
+                tolerance,
+            ).item()
+            grouped = cluster_candidates(
+                candidates, geometry, config=tolerance
+            )
+            reference = _cluster_candidates_serial_oracle(
+                candidates, geometry, config=tolerance
+            )
+            _assert_grouping_tables_equal(cp, grouped, reference)
+            assert grouped.complete and not grouped.timed_out
+            assert len(grouped.events) == 1
+            assert len(grouped.candidates) == len(grouped.members) == 2
+            assert grouped.events.member_count.tolist() == [2]
+            assert grouped.candidate_event_id.tolist() == [0, 0]
+            assert grouped.events.representative_candidate_index.tolist() == [
+                representative
+            ]
+            assert grouped.members.candidate_index.tolist() == [
+                representative, other
+            ]
+            assert grouped.members.is_representative.tolist() == [True, False]
+            for field in fields(grouped.events):
+                if hasattr(candidates, field.name):
+                    assert getattr(grouped.events, field.name).item() == (
+                        getattr(candidates, field.name)[representative].item()
+                    ), field.name
+            # Every saved decoded input field survives unchanged, including
+            # full-precision DM/TOA, width, subband, flags and argmax token.
+            for field in fields(candidates):
+                if field.name in records[0]:
+                    assert getattr(grouped.candidates, field.name).tolist() == [
+                        row[field.name] for row in records
+                    ], field.name
+
+
+def test_chord_primary_dm_boundary_and_sample_override(cuda_device_id=0):
+    """Adjacent full-band primary trees can merge at their actual DM border."""
+
+    import cupy as cp
+
+    from ..pirate_pybind11 import DedispersionConfig, DedispersionPlan
+
+    filename = str(Path(__file__).parent / "data" / "chord_sb2_et.yml")
+    boundaries = []
+    with cp.cuda.Device(cuda_device_id):
+        for sample_ms in (1.0, 0.9984):
+            config = DedispersionConfig.from_yaml(filename)
+            config.time_sample_ms = sample_ms
+            plan = DedispersionPlan(config)
+            geometry = ClusteringGeometry.from_plan(plan)
+            full_band = {
+                int(tree.primary_tree_index): index
+                for index, tree in enumerate(plan.trees)
+                if int(tree.early_trigger_level) == 0
+            }
+            low_index, high_index = full_band[0], full_band[1]
+            low, high = plan.trees[low_index], plan.trees[high_index]
+            boundary = float(low.dm_max)
+            assert boundary == float(high.dm_min)
+            boundaries.append(boundary)
+            low_step = float(geometry.dm_step_by_tree[low_index].item())
+            high_step = float(geometry.dm_step_by_tree[high_index].item())
+            padding = 1.5 * max(
+                float(geometry.time_step_samples_by_tree[low_index].item()),
+                float(geometry.time_step_samples_by_tree[high_index].item()),
+            )
+            # Coarse-bin centres on either side; actual producer grid spacing,
+            # not guessed physical DM or an altered tolerance.
+            lower_dm = boundary - 0.5 * low_step
+            upper_dm = boundary + 0.5 * high_step
+            dm_difference = upper_dm - lower_dm
+            residual_midpoint = 0.5 * (
+                geometry.residual_slope_lo_samples_per_dm
+                + geometry.residual_slope_hi_samples_per_dm
+            ) * dm_difference
+            common = {
+                "source_chunk_index": 64,
+                "itime": 20,
+                "beam_id": 0,
+            }
+            candidates = _candidates(cp, geometry, [
+                dict(
+                    common, tree=low_index, snr=40.0,
+                    idm=int(low.ndm_out) - 1, dm=lower_dm, toa=100000.0,
+                ),
+                dict(
+                    common, tree=high_index, snr=30.0,
+                    idm=0, dm=upper_dm, toa=100000.0 + residual_midpoint,
+                ),
+                dict(
+                    common, tree=high_index, snr=20.0,
+                    idm=0, dm=upper_dm,
+                    toa=100000.0
+                    + geometry.residual_slope_hi_samples_per_dm * dm_difference
+                    + padding + 1.0,
+                ),
+            ])
+            assert candidates.primary_tree_index.tolist() == [0, 1, 1]
+            assert compatible_with_representative(
+                candidates, 0, cp.asarray([1, 2]), geometry
+            ).tolist() == [True, False]
+            grouped = cluster_candidates(candidates, geometry)
+            _assert_grouping_tables_equal(
+                cp, grouped,
+                _cluster_candidates_serial_oracle(candidates, geometry),
+            )
+            assert grouped.candidate_event_id.tolist() == [0, 0, 1]
+            assert grouped.events.member_count.tolist() == [2, 1]
+            assert grouped.events.representative_candidate_index.tolist() == [
+                0, 2
+            ]
+        # The effective 0.9984 ms sampling changes the physical DM border;
+        # this guards against silently using the nominal YAML value.
+        assert np.isclose(boundaries[1] / boundaries[0], 0.9984, rtol=1e-14)
+
+
+def test_same_tree_many_members_and_distinct_nearby_bursts(cuda_device_id=0):
+    """Deduplicate each nearby burst without fusing distinct temporal peaks."""
+
+    import cupy as cp
+
+    with cp.cuda.Device(cuda_device_id):
+        geometry = _timeout_geometry(cp)
+        candidates = _candidates(cp, geometry, [
+            {"tree": 0, "snr": 30.0, "dm": 100.0, "toa": 1000.0},
+            {"tree": 0, "snr": 28.0, "dm": 100.2, "toa": 1000.2},
+            {"tree": 0, "snr": 26.0, "dm": 99.9, "toa": 999.8},
+            {"tree": 0, "snr": 24.0, "dm": 100.1, "toa": 1000.5},
+            {"tree": 0, "snr": 22.0, "dm": 100.0, "toa": 1003.1},
+            {"tree": 1, "snr": 20.0, "dm": 100.2, "toa": 1003.3},
+            {"tree": 0, "snr": 18.0, "dm": 103.0, "toa": 1000.0},
+        ])
+        grouped = cluster_candidates(candidates, geometry)
+        _assert_grouping_tables_equal(
+            cp, grouped, _cluster_candidates_serial_oracle(candidates, geometry)
+        )
+        assert grouped.candidate_event_id.tolist() == [0, 0, 0, 0, 1, 1, 2]
+        assert grouped.events.member_count.tolist() == [4, 2, 1]
+        assert grouped.events.representative_candidate_index.tolist() == [0, 4, 6]
+
+
+def test_grouping_does_not_grow_through_nonrepresentative_members(
+        cuda_device_id=0):
+    """B matches A and C, but C stays separate when it cannot match seed A."""
+
+    import cupy as cp
+
+    with cp.cuda.Device(cuda_device_id):
+        geometry = _timeout_geometry(cp)
+        candidates = _candidates(cp, geometry, [
+            {"tree": 0, "snr": 30.0, "dm": 0.0, "toa": 0.0},
+            {"tree": 0, "snr": 20.0, "dm": 0.0, "toa": 1.0},
+            {"tree": 1, "snr": 10.0, "dm": 0.0, "toa": 2.0},
+        ])
+        assert compatible_with_representative(
+            candidates, 1, cp.asarray([2]), geometry
+        ).item()
+        grouped = cluster_candidates(candidates, geometry)
+        _assert_grouping_tables_equal(
+            cp, grouped, _cluster_candidates_serial_oracle(candidates, geometry)
+        )
+        assert grouped.candidate_event_id.tolist() == [0, 0, 1]
+        assert grouped.events.member_count.tolist() == [2, 1]
+
+
+def test_grouping_inclusive_dm_and_time_limits(cuda_device_id=0):
+    """Exact limits join; the nearest representable value outside does not."""
+
+    import cupy as cp
+
+    with cp.cuda.Device(cuda_device_id):
+        geometry = _timeout_geometry(cp)
+        outside = np.nextafter(1.5, np.inf)
+        rows = [
+            {"tree": 0, "snr": 100.0, "dm": 0.0, "toa": 0.0},
+            {"tree": 0, "dm": 1.5, "toa": 0.0},
+            {"tree": 1, "dm": -1.5, "toa": 0.0},
+            {"tree": 0, "dm": outside, "toa": 0.0},
+            {"tree": 1, "dm": -outside, "toa": 0.0},
+            {"tree": 0, "dm": 0.0, "toa": 1.5},
+            {"tree": 1, "dm": 0.0, "toa": -1.5},
+            {"tree": 0, "dm": 0.0, "toa": outside},
+            {"tree": 1, "dm": 0.0, "toa": -outside},
+        ]
+        candidates = _candidates(cp, geometry, rows)
+        assert compatible_with_representative(
+            candidates, 0, cp.arange(1, len(rows)), geometry
+        ).tolist() == [True, True, False, False, True, True, False, False]
+        grouped = cluster_candidates(candidates, geometry)
+        _assert_grouping_tables_equal(
+            cp, grouped, _cluster_candidates_serial_oracle(candidates, geometry)
+        )
+        first = grouped.members.candidate_index[grouped.members.event_id == 0]
+        assert set(first.tolist()) == {0, 1, 2, 5, 6}
+
+
+def test_large_same_tree_group_commits_all_tiles(cuda_device_id=0):
+    """A same-tree group spanning multiple CUDA tiles retains every member."""
+
+    import cupy as cp
+
+    with cp.cuda.Device(cuda_device_id):
+        geometry = _timeout_geometry(cp)
+        candidates = _candidates(cp, geometry, [
+            {"tree": 0, "snr": 1000.0 - i, "dm": 100.0, "toa": 1000.0}
+            for i in range(600)
+        ])
+        grouped = cluster_candidates(candidates, geometry)
+        _assert_grouping_tables_equal(
+            cp, grouped, _cluster_candidates_serial_oracle(candidates, geometry)
+        )
+        assert grouped.complete and not grouped.timed_out
+        assert grouped.events.member_count.tolist() == [600]
+        assert grouped.members.candidate_index.tolist() == list(range(600))
+        assert grouped.candidate_event_id.tolist() == [0] * 600
+
+
+def test_seeded_multibeam_grouping_matches_oracle_for_hot_dtypes(
+        cuda_device_id=0):
+    """Planted same-/cross-tree groups agree for float32 and mixed predicates."""
+
+    import cupy as cp
+
+    rng = np.random.default_rng(20260928)
+    rows = []
+    for group_index in range(8):
+        # Coincident copies on separate beams must stay separate. Distinct
+        # physical groups are far enough apart in DM to avoid accidental links.
+        physical_group = group_index // 2
+        dm_center = 100.0 + 20.0 * physical_group
+        toa_center = 1000.0 + 100.0 * physical_group
+        trees = rng.permutation([0, 0, 0, 1, 1, 2, 2, 2, 3, 3])
+        for member in range(10):
+            # Binary fractions stay exactly representable in each dtype;
+            # margins remain away from tolerance boundaries, whose inclusive
+            # behavior is tested separately.
+            dm_jitter = float(rng.integers(-2, 3)) / 8.0 if member else 0.0
+            time_jitter = float(rng.integers(-2, 3)) / 8.0 if member else 0.0
+            rows.append({
+                "beam_id": 7 + group_index % 2,
+                "tree": int(trees[member]),
+                "snr": 1000.0 - group_index if member == 0 else float(
+                    rng.integers(20, 40)
+                ),
+                "dm": dm_center + dm_jitter,
+                "toa": toa_center + dm_jitter + time_jitter,
+                "source_chunk_index": 4 + int(rng.integers(0, 2)),
+                "idm": group_index * 100 + member,
+                "itime": int(rng.integers(0, 64)),
+                "argmax_token": group_index * 10 + member,
+                "edge_flags": int(rng.integers(0, 2)),
+            })
+    permutation = rng.permutation(len(rows))
+    shuffled_rows = [rows[int(index)] for index in permutation]
+    # The leading member of each planted group is unambiguously the loudest.
+    expected_representatives = [
+        int(np.flatnonzero(permutation == group * 10)[0])
+        for group in range(8)
+    ]
+    hot_fields = ("dm", "toa_sample_abs", "dm_step", "time_step_samples")
+    variants = (
+        (np.float32, np.float32, np.float32, np.float32),
+        (np.float32, np.float64, np.float32, np.float64),
+        (np.float64, np.float32, np.float64, np.float32),
+    )
+    with cp.cuda.Device(cuda_device_id):
+        geometry = _geometry(cp)
+        original = _candidates(cp, geometry, shuffled_rows)
+        for dtypes in variants:
+            candidates = replace(original, **{
+                name: getattr(original, name).astype(dtype)
+                for name, dtype in zip(hot_fields, dtypes)
+            })
+            grouped = cluster_candidates(candidates, geometry)
+            oracle = _cluster_candidates_serial_oracle(candidates, geometry)
+            _assert_grouping_tables_equal(cp, grouped, oracle)
+            assert grouped.complete and not grouped.timed_out
+            assert len(grouped.events) == 8
+            assert grouped.events.member_count.tolist() == [10] * 8
+            assert grouped.events.representative_candidate_index.tolist() == (
+                expected_representatives
+            )
+            assert len(grouped.candidates) == len(grouped.members) == 80
+            assert sorted(grouped.members.candidate_index.tolist()) == list(
+                range(80)
+            )
+            assert int(cp.sum(grouped.members.is_representative).item()) == 8
+            assert grouped.candidate_event_id.tolist() == [
+                int(index) // 10 for index in permutation
+            ]

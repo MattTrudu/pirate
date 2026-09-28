@@ -1,0 +1,5 @@
+[event_monitor] 1 beams, 65.431 s; no output files.
+[event_monitor] Listening at 127.0.0.1:21703; prints only. Ctrl-C to stop.
+[event_monitor] beam=1 tree=0 DM=499.9978 S/N=46.062 sub-band=300.000-1500.000 MHz TOA=40.000067 s (at 300 MHz, from observation start)
+[event_monitor] Printed 1 detection(s).
+[event_monitor] Stopped.

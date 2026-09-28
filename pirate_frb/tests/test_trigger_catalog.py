@@ -327,3 +327,72 @@ def test_catalog_rejects_missing_decoder_provenance():
             pass
         else:
             raise AssertionError("catalog accepted incompatible decoder provenance")
+
+
+def test_catalog_roundtrip_same_tree_and_cross_primary_members(cuda_device_id=0):
+    """A mixed-family halo event survives ASDF; beam/window boundaries do not."""
+    import copy
+    import asdf
+    import cupy as cp
+
+    with cp.cuda.Device(cuda_device_id):
+        geometry = _geometry(cp)
+        grouped = cluster_candidates(_candidates(cp, geometry, [
+            dict(beam_id=100, tree=0, source_chunk_index=2,
+                 snr=20.0, dm=50.0, toa=4095.75),
+            dict(beam_id=100, tree=0, source_chunk_index=3,
+                 snr=18.0, dm=50.2, toa=4096.0),
+            dict(beam_id=100, tree=2, source_chunk_index=3,
+                 snr=30.0, dm=50.1, toa=4096.1),
+        ]), geometry)
+        assert grouped.events.member_count.tolist() == [3]
+        batch = catalog_batch_from_grouping_result(
+            grouped, grouping_window_id=0,
+            event_id_offset=0, candidate_id_offset=0,
+        )
+        metadata = _metadata()
+        metadata["processing"]["beam_batch_size"] = 2
+        metadata["grouping_windows"] = metadata["grouping_windows"][:2]
+        for window in metadata["grouping_windows"]:
+            window["beam_ids"] = [100, 101]
+        coverage = ((100, 2), (100, 3), (101, 2), (101, 3))
+        with tempfile.TemporaryDirectory(prefix="pirate-cross-primary-catalog-") as tmp:
+            output = write_trigger_catalog(
+                os.path.join(tmp, "events.asdf"), (batch,),
+                coverage=coverage, metadata=metadata,
+            )
+            with asdf.open(output, lazy_load=False) as af:
+                validate_trigger_catalog_tree(af.tree)
+                events, members = af.tree["events"], af.tree["members"]
+                assert events["member_count"].tolist() == [3]
+                assert events["tree"].tolist() == [2]
+                assert events["primary_tree_index"].tolist() == [1]
+                assert events["source_chunk_index"].tolist() == [3]
+                assert events["grouping_window_id"].tolist() == [0]
+                assert sorted(members["tree"].tolist()) == [0, 0, 2]
+                assert sorted(members["primary_tree_index"].tolist()) == [0, 0, 1]
+                for name in batch.events:
+                    np.testing.assert_array_equal(events[name], batch.events[name])
+                for name in batch.members:
+                    np.testing.assert_array_equal(members[name], batch.members[name])
+
+        valid = build_trigger_catalog_tree(
+            (batch,), coverage=coverage, metadata=metadata,
+        )
+        # Both beams belong to the window, so this must reject the event's
+        # cross-beam membership rather than merely an unknown beam.
+        wrong_beam = copy.deepcopy(valid)
+        owner_row = wrong_beam["members"]["candidate_id"] == 0
+        wrong_beam["members"]["beam_id"][owner_row] = 101
+        # This halo member also lies in the next window's valid source range,
+        # but one event cannot mix provenance windows.
+        wrong_window = copy.deepcopy(valid)
+        halo_row = wrong_window["members"]["candidate_id"] == 1
+        wrong_window["members"]["grouping_window_id"][halo_row] = 1
+        for invalid in (wrong_beam, wrong_window):
+            try:
+                validate_trigger_catalog_tree(invalid)
+            except ValueError as exc:
+                assert "event members cross a grouping domain or window" in str(exc)
+            else:
+                raise AssertionError("catalog accepted cross-beam/window event members")

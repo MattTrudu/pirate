@@ -44,7 +44,9 @@ for the algorithm, explanatory figures and measured performance.
 
 Start with the [one-beam FRB search](examples/simple_frb/README.md): generate a
 DM 500, sigma 1 ms, S/N 50 broadband burst, save its offline maps and grouped
-events, then run the same observation online. Both observation examples are under [examples/](examples/README.md).
+events, then run the same observation online. The [DM-boundary example](examples/dm_boundary/README.md)
+shows native peaks from adjacent primary trees being clustered into one event.
+All observation examples are under [examples/](examples/README.md).
 
 For classifier development, open the [classifier notebook](AIclassifier/README.md).
 It includes just the detected FRB's map chunk and catalog, and walks from the
